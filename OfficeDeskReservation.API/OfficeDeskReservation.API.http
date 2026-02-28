@@ -1,0 +1,6 @@
+@OfficeDeskReservation.API_HostAddress = http://localhost:5253
+
+GET {{OfficeDeskReservation.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
