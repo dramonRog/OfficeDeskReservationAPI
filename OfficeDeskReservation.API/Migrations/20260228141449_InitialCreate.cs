@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace OfficeDeskReservation.API.Migrations
 {
     /// <inheritdoc />
@@ -32,7 +34,7 @@ namespace OfficeDeskReservation.API.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     IsAdmin = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -88,6 +90,30 @@ namespace OfficeDeskReservation.API.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "Rooms",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Open Space A" },
+                    { 2, "Meeting Room 1" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "Email", "FirstName", "IsAdmin", "LastName" },
+                values: new object[] { 1, "roman.buchynskyi2006@gmail.com", "Roman", true, "Buchynskyi" });
+
+            migrationBuilder.InsertData(
+                table: "Desks",
+                columns: new[] { "Id", "DeskIdentifier", "RoomId" },
+                values: new object[,]
+                {
+                    { 1, "A-101", 1 },
+                    { 2, "A-102", 1 },
+                    { 3, "M-01", 2 }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Desks_RoomId",
                 table: "Desks",
@@ -102,6 +128,12 @@ namespace OfficeDeskReservation.API.Migrations
                 name: "IX_Reservations_UserId",
                 table: "Reservations",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_Email",
+                table: "Users",
+                column: "Email",
+                unique: true);
         }
 
         /// <inheritdoc />
