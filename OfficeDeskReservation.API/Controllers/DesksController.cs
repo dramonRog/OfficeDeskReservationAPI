@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OfficeDeskReservation.API.Data;
 using OfficeDeskReservation.API.Dtos;
@@ -11,10 +12,11 @@ namespace OfficeDeskReservation.API.Controllers
     public class DesksController : ControllerBase
     {
         private readonly AppDbContext _context;
-
-        public DesksController(AppDbContext context)
+        private readonly IMapper _mapper;
+        public DesksController(AppDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
 
@@ -22,12 +24,7 @@ namespace OfficeDeskReservation.API.Controllers
         public async Task<ActionResult<List<DeskDto>>> GetDesksAsync()
         {
             List<Desk> desks = await _context.Desks.ToListAsync();
-            List<DeskDto> desksDtos = desks.Select(desk => new DeskDto
-            {
-                Id = desk.Id,
-                DeskIdentifier = desk.DeskIdentifier,
-                RoomId = desk.RoomId
-            }).ToList();
+            List<DeskDto> desksDtos = _mapper.Map<List<DeskDto>>(desks);
 
             return Ok(desksDtos);
         }
@@ -41,14 +38,8 @@ namespace OfficeDeskReservation.API.Controllers
             if (existingDesk == null)
                 return NotFound();
 
-            DeskDto result = new DeskDto
-            {
-                Id = id,
-                DeskIdentifier = existingDesk.DeskIdentifier,
-                RoomId = existingDesk.RoomId
-            };
-
-            return Ok(result);
+            DeskDto deskDto = _mapper.Map<DeskDto>(existingDesk);
+            return Ok(deskDto);
         }
 
 
@@ -61,16 +52,12 @@ namespace OfficeDeskReservation.API.Controllers
             if (!await _context.Rooms.AnyAsync(r => r.Id == desk.RoomId))
                 return BadRequest("This room doesn't exist.");
 
-            Desk result = new Desk
-            {
-                DeskIdentifier = desk.DeskIdentifier,
-                RoomId = desk.RoomId
-            };
+            Desk result = _mapper.Map<Desk>(desk);
 
             _context.Desks.Add(result);
             await _context.SaveChangesAsync();
-            
-            desk.Id = result.Id;
+
+            _mapper.Map(result, desk);
             return CreatedAtAction("GetDeskById", new { id = desk.Id }, desk);
         }
 
@@ -88,8 +75,8 @@ namespace OfficeDeskReservation.API.Controllers
             if (!await _context.Rooms.AnyAsync(r => r.Id == desk.RoomId))
                 return BadRequest("The specified RoomId does not exist.");
 
-            updatingDesk.DeskIdentifier = desk.DeskIdentifier;
-            updatingDesk.RoomId = desk.RoomId;
+
+            _mapper.Map(desk, updatingDesk);
             await _context.SaveChangesAsync();
 
             return NoContent();
