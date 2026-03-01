@@ -16,6 +16,9 @@ namespace OfficeDeskReservation.API.Mappings
 
             CreateMap<UserDto, User>();
             CreateMap<User, UserDto>();
+
+            CreateMap<ReservationDto, Reservation>();
+            CreateMap<Reservation, ReservationDto>();
         }
     }
 }
