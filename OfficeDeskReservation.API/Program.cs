@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using OfficeDeskReservation.API.Data;
+using OfficeDeskReservation.API.Mappings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,8 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
+
+builder.Services.AddAutoMapper(cfg => cfg.AddProfile<AppMappingProfile>());
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
