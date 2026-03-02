@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using OfficeDeskReservation.API.Data;
 using OfficeDeskReservation.API.Dtos.Users;
 using OfficeDeskReservation.API.Models;
+using OfficeDeskReservation.API.Services.Interfaces;
 
 namespace OfficeDeskReservation.API.Controllers
 {
@@ -11,96 +12,69 @@ namespace OfficeDeskReservation.API.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly AppDbContext _context;
-        private readonly IMapper _mapper;
-
-        public UsersController(AppDbContext context, IMapper mapper)
+        private readonly IUserService _service;
+        public UsersController(IUserService service)
         {
-            _context = context;
-            _mapper = mapper;
+            _service = service;
         }
 
 
         [HttpGet]
         public async Task<ActionResult<List<UserResponseDto>>> GetUsersAsync()
         {
-            List<User> usersList = await _context.Users
-                .Include(u => u.Reservations)
-                    .ThenInclude(r => r.Desk)
-                        .ThenInclude(d => d.Room)
-            .ToListAsync();
-
-            return Ok(_mapper.Map<List<UserResponseDto>>(usersList));
+            List<UserResponseDto> users = await _service.GetUsersAsync();
+            return Ok(users);
         }
 
 
         [HttpGet("{id}")]
         public async Task<ActionResult<UserResponseDto>> GetUserByIdAsync(int id)
         {
-            User? user = await _context.Users
-                .Include(u => u.Reservations)
-                    .ThenInclude(r => r.Desk)
-                        .ThenInclude(d => d.Room)
-                .FirstOrDefaultAsync(u => u.Id == id);
+            UserResponseDto? user = await _service.GetUserByIdAsync(id);
 
             if (user == null)
                 return NotFound();
-            return Ok(_mapper.Map<UserResponseDto>(user));
+            return Ok(user);
         }
 
 
         [HttpPost]
         public async Task<ActionResult<UserResponseDto>> PostUserAsync([FromBody] UserDto user)
         {
-            if (await _context.Users.AnyAsync(u => u.FirstName == user.FirstName && u.LastName == user.LastName))
-                return Conflict("User with such name and surname already exists.");
-            if (await _context.Users.AnyAsync(u => u.Email == user.Email))
-                return Conflict("User with such email already exists.");
-
-            User result = _mapper.Map<User>(user);
-            _context.Users.Add(result);
-            await _context.SaveChangesAsync();
-            
-            UserResponseDto response = _mapper.Map<UserResponseDto>(result);
-
-            return CreatedAtAction("GetUserById", new { id = response.Id }, response);
+            try
+            {
+                UserResponseDto? result = await _service.CreateUserAsync(user);
+                return CreatedAtAction("GetUserById", new { id = result.Id }, result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
         }
 
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUserAsync(int id, [FromBody] UserDto user)
         {
-            User? existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
-
-            if (existingUser == null)
-                return NotFound("No user with such ID.");
-
-            if (await _context.Users.AnyAsync(u => u.Email == user.Email && u.Id != id))
-                return Conflict("Another user with this email already exists.");
-
-            if (await _context.Users.AnyAsync(u => u.FirstName == user.FirstName && u.LastName == user.LastName && u.Id != id))
-                return Conflict("Another user with such name and surname already exists.");
-
-            _mapper.Map(user, existingUser);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            try
+            {
+                if (await _service.UpdateUserAsync(id, user))
+                    return NoContent();
+                return NotFound();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
         }
 
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> RemoveUserByIdAsync(int id)
         {
-            User? user = await _context.Users.Include(u => u.Reservations).FirstOrDefaultAsync(u => u.Id == id);
-
-            if (user == null)
-                return NotFound();
-
-            _context.Reservations.RemoveRange(user.Reservations);
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            if (await _service.DeleteUserAsync(id))
+                return NoContent();
+            return NotFound();
         }
     }
 }
