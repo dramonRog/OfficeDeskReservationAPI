@@ -8,10 +8,12 @@ namespace OfficeDeskReservation.API.Mappings
     {
         public AppMappingProfile()
         {
-            CreateMap<Desk, DeskDto>();
-            CreateMap<Room, RoomDto>();
+            CreateMap<DeskDto,Desk>();
+            CreateMap<Desk, DeskResponseDto>()
+                .ForMember(dest => dest.RoomName,
+                           opt => opt.MapFrom(src => src.Room!.Name));
 
-            CreateMap<DeskDto, Desk>();
+            CreateMap<Room, RoomDto>();
             CreateMap<RoomDto, Room>();
 
             CreateMap<UserDto, User>();
@@ -22,9 +24,9 @@ namespace OfficeDeskReservation.API.Mappings
                 .ForMember(dest => dest.UserName,
                            opt => opt.MapFrom(src => $"{src.User!.FirstName} {src.User.LastName}"))
                 .ForMember(dest => dest.DeskName,
-                           opt => opt.MapFrom(src => $"{src.Desk!.DeskIdentifier}"))
+                           opt => opt.MapFrom(src => src.Desk!.DeskIdentifier))
                 .ForMember(dest => dest.RoomName,
-                           opt => opt.MapFrom(src => $"{src.Desk!.Room!.Name}"));
+                           opt => opt.MapFrom(src => src.Desk!.Room!.Name));
         }
     }
 }

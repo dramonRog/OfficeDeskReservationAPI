@@ -21,53 +21,52 @@ namespace OfficeDeskReservation.API.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<List<DeskDto>>> GetDesksAsync()
+        public async Task<ActionResult<List<DeskResponseDto>>> GetDesksAsync()
         {
-            List<Desk> desks = await _context.Desks.ToListAsync();
-            List<DeskDto> desksDtos = _mapper.Map<List<DeskDto>>(desks);
+            List<Desk> desks = await _context.Desks.Include(d => d.Room).ToListAsync();
+            List<DeskResponseDto> desksDtos = _mapper.Map<List<DeskResponseDto>>(desks);
 
             return Ok(desksDtos);
         }
 
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<DeskDto>> GetDeskByIdAsync(int id)
+        public async Task<ActionResult<DeskResponseDto>> GetDeskByIdAsync(int id)
         {
-            Desk? existingDesk = await _context.Desks.FirstOrDefaultAsync(desk => desk.Id == id);
+            Desk? existingDesk = await _context.Desks.Include(d => d.Room).FirstOrDefaultAsync(desk => desk.Id == id);
 
             if (existingDesk == null)
                 return NotFound();
 
-            DeskDto deskDto = _mapper.Map<DeskDto>(existingDesk);
+            DeskResponseDto deskDto = _mapper.Map<DeskResponseDto>(existingDesk);
             return Ok(deskDto);
         }
 
 
         [HttpPost]
-        public async Task<ActionResult<DeskDto>> PostDeskAsync([FromBody] DeskDto desk)
+        public async Task<ActionResult<DeskResponseDto>> PostDeskAsync([FromBody] DeskDto desk)
         {
             if (await _context.Desks.AnyAsync(d => d.DeskIdentifier == desk.DeskIdentifier))
                 return Conflict("The desk with than name already exists.");
 
-            if (!await _context.Rooms.AnyAsync(r => r.Id == desk.RoomId))
+            Room? existingRoom = await _context.Rooms.FirstOrDefaultAsync(r => r.Id == desk.RoomId);
+            if (existingRoom == null)
                 return BadRequest("This room doesn't exist.");
 
             Desk result = _mapper.Map<Desk>(desk);
+            result.Room = existingRoom;
 
             _context.Desks.Add(result);
             await _context.SaveChangesAsync();
 
-            _mapper.Map(result, desk);
-            return CreatedAtAction("GetDeskById", new { id = desk.Id }, desk);
+            DeskResponseDto responseDesk = _mapper.Map<DeskResponseDto>(result);
+            return CreatedAtAction("GetDeskById", new { id = responseDesk.Id }, responseDesk);
         }
 
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutDeskAsync(int id, [FromBody] DeskDto desk)
         {
-            if (id != desk.Id)
-                return BadRequest();
-
             Desk? updatingDesk = await _context.Desks.FirstOrDefaultAsync(d => d.Id == id);
             if (updatingDesk == null)
                 return NotFound();
@@ -75,6 +74,8 @@ namespace OfficeDeskReservation.API.Controllers
             if (!await _context.Rooms.AnyAsync(r => r.Id == desk.RoomId))
                 return BadRequest("The specified RoomId does not exist.");
 
+            if (await _context.Desks.AnyAsync(d => d.Id != id && d.DeskIdentifier == desk.DeskIdentifier))
+                return Conflict("The desk with that name already exists!");
 
             _mapper.Map(desk, updatingDesk);
             await _context.SaveChangesAsync();
