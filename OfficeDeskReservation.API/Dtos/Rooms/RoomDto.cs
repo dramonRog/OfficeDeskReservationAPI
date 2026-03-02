@@ -1,6 +1,6 @@
 ﻿using OfficeDeskReservation.API.Models;
 
-namespace OfficeDeskReservation.API.Dtos
+namespace OfficeDeskReservation.API.Dtos.Rooms
 {
     public class RoomDto
     {

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OfficeDeskReservation.API.Data;
-using OfficeDeskReservation.API.Dtos;
+using OfficeDeskReservation.API.Dtos.Rooms;
 using OfficeDeskReservation.API.Models;
 
 namespace OfficeDeskReservation.API.Controllers
@@ -24,7 +24,11 @@ namespace OfficeDeskReservation.API.Controllers
         [HttpGet]
         public async Task<ActionResult<List<RoomResponseDto>>> GetRoomsAsync()
         {
-            List<Room> rooms = await _context.Rooms.Include(r => r.Desks).ToListAsync();
+            List<Room> rooms = await _context.Rooms
+                .Include(r => r.Desks)
+                    .ThenInclude(d => d.Reservations)
+                        .ThenInclude(res => res.User)
+                .ToListAsync();
             List<RoomResponseDto> roomsDtos = _mapper.Map<List<RoomResponseDto>>(rooms);
 
             return Ok(roomsDtos);
@@ -36,6 +40,8 @@ namespace OfficeDeskReservation.API.Controllers
         {
             Room? existingRoom = await _context.Rooms
                 .Include(r => r.Desks)
+                    .ThenInclude(d => d.Reservations)
+                        .ThenInclude(res => res.User)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
             if (existingRoom == null)

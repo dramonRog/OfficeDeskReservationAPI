@@ -1,4 +1,6 @@
-﻿namespace OfficeDeskReservation.API.Dtos
+﻿using OfficeDeskReservation.API.Dtos.Reservations;
+
+namespace OfficeDeskReservation.API.Dtos.Desks
 {
     public class DeskResponseDto
     {

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OfficeDeskReservation.API.Data;
-using OfficeDeskReservation.API.Dtos;
+using OfficeDeskReservation.API.Dtos.Reservations;
 using OfficeDeskReservation.API.Models;
 
 namespace OfficeDeskReservation.API.Controllers

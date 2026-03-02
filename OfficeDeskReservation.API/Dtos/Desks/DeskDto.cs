@@ -1,4 +1,4 @@
-﻿namespace OfficeDeskReservation.API.Dtos
+﻿namespace OfficeDeskReservation.API.Dtos.Desks
 {
     public class DeskDto
     {

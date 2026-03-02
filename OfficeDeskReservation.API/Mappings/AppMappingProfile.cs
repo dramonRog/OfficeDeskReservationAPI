@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
-using OfficeDeskReservation.API.Dtos;
+using OfficeDeskReservation.API.Dtos.Desks;
+using OfficeDeskReservation.API.Dtos.Reservations;
+using OfficeDeskReservation.API.Dtos.Rooms;
+using OfficeDeskReservation.API.Dtos.Users;
 using OfficeDeskReservation.API.Models;
 
 namespace OfficeDeskReservation.API.Mappings
