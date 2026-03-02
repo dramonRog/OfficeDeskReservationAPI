@@ -22,26 +22,35 @@ namespace OfficeDeskReservation.API.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<List<UserDto>>> GetUsersAsync()
+        public async Task<ActionResult<List<UserResponseDto>>> GetUsersAsync()
         {
-            List<User> usersList = await _context.Users.ToListAsync();
-            return Ok(_mapper.Map<List<UserDto>>(usersList));
+            List<User> usersList = await _context.Users
+                .Include(u => u.Reservations)
+                    .ThenInclude(r => r.Desk)
+                        .ThenInclude(d => d.Room)
+            .ToListAsync();
+
+            return Ok(_mapper.Map<List<UserResponseDto>>(usersList));
         }
 
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserDto>> GetUserByIdAsync(int id)
+        public async Task<ActionResult<UserResponseDto>> GetUserByIdAsync(int id)
         {
-            User? user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            User? user = await _context.Users
+                .Include(u => u.Reservations)
+                    .ThenInclude(r => r.Desk)
+                        .ThenInclude(d => d.Room)
+                .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)
                 return NotFound();
-            return _mapper.Map<UserDto>(user);
+            return Ok(_mapper.Map<UserResponseDto>(user));
         }
 
 
         [HttpPost]
-        public async Task<ActionResult<UserDto>> PostUserAsync([FromBody] UserDto user)
+        public async Task<ActionResult<UserResponseDto>> PostUserAsync([FromBody] UserDto user)
         {
             if (await _context.Users.AnyAsync(u => u.FirstName == user.FirstName && u.LastName == user.LastName))
                 return Conflict("User with such name and surname already exists.");
@@ -49,20 +58,18 @@ namespace OfficeDeskReservation.API.Controllers
                 return Conflict("User with such email already exists.");
 
             User result = _mapper.Map<User>(user);
-            _context.Add(result);
+            _context.Users.Add(result);
             await _context.SaveChangesAsync();
-            _mapper.Map(result, user);
+            
+            UserResponseDto response = _mapper.Map<UserResponseDto>(result);
 
-            return CreatedAtAction("GetUserById", new { id = user.Id }, user);
+            return CreatedAtAction("GetUserById", new { id = response.Id }, response);
         }
 
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUserAsync(int id, [FromBody] UserDto user)
         {
-            if (id != user.Id)
-                return BadRequest("ID in URL doesn't match ID in body");
-
             User? existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
 
             if (existingUser == null)
@@ -84,11 +91,12 @@ namespace OfficeDeskReservation.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> RemoveUserByIdAsync(int id)
         {
-            User? user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            User? user = await _context.Users.Include(u => u.Reservations).FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)
                 return NotFound();
 
+            _context.Reservations.RemoveRange(user.Reservations);
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
 
