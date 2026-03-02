@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OfficeDeskReservation.API.Data;
 using OfficeDeskReservation.API.Dtos;
-using OfficeDeskReservation.API.Mappings;
 using OfficeDeskReservation.API.Models;
 
 namespace OfficeDeskReservation.API.Controllers
@@ -23,17 +22,17 @@ namespace OfficeDeskReservation.API.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<List<RoomDto>>> GetRoomsAsync()
+        public async Task<ActionResult<List<RoomResponseDto>>> GetRoomsAsync()
         {
             List<Room> rooms = await _context.Rooms.Include(r => r.Desks).ToListAsync();
-            List<RoomDto> roomsDtos = _mapper.Map<List<RoomDto>>(rooms);
+            List<RoomResponseDto> roomsDtos = _mapper.Map<List<RoomResponseDto>>(rooms);
 
             return Ok(roomsDtos);
         }
 
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<RoomDto>> GetRoomByIdAsync(int id)
+        public async Task<ActionResult<RoomResponseDto>> GetRoomByIdAsync(int id)
         {
             Room? existingRoom = await _context.Rooms
                 .Include(r => r.Desks)
@@ -42,14 +41,14 @@ namespace OfficeDeskReservation.API.Controllers
             if (existingRoom == null)
                 return NotFound();
 
-            RoomDto roomDto = _mapper.Map<RoomDto>(existingRoom);
+            RoomResponseDto roomDto = _mapper.Map<RoomResponseDto>(existingRoom);
 
             return Ok(roomDto);
         }
 
 
         [HttpPost]
-        public async Task<ActionResult<RoomDto>> PostRoomAsync([FromBody] RoomDto room)
+        public async Task<ActionResult<RoomResponseDto>> PostRoomAsync([FromBody] RoomDto room) 
         {
             if (await _context.Rooms.AnyAsync(r => r.Name == room.Name))
                 return Conflict("Room with this name already exists.");
@@ -58,19 +57,24 @@ namespace OfficeDeskReservation.API.Controllers
 
             _context.Rooms.Add(result);
             await _context.SaveChangesAsync();
-            room.Id = result.Id;
 
-            return CreatedAtAction("GetRoomById", new { id = room.Id }, room);
+            RoomResponseDto response = _mapper.Map<RoomResponseDto>(result);
+
+            return CreatedAtAction("GetRoomById", new { id = response.Id }, response);
         }
 
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteByIdAsync(int id)
         {
-            Room? room = await _context.Rooms.FirstOrDefaultAsync(r => r.Id == id);
+            Room? room = await _context.Rooms.Include(r => r.Desks).FirstOrDefaultAsync(r => r.Id == id);
 
             if (room == null)
                 return NotFound();
+
+            if (room.Desks.Any())
+                return BadRequest("This room can't be deleted, as it contains desks.");
+
             _context.Rooms.Remove(room);
             await _context.SaveChangesAsync();
 
@@ -79,17 +83,17 @@ namespace OfficeDeskReservation.API.Controllers
 
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateRoom(int id, [FromBody] RoomDto room)
+        public async Task<IActionResult> PutRoomAsync(int id, [FromBody] RoomDto room)
         {
-            if (id != room.Id)
-                return BadRequest("ID in URL does not match ID in body.");
-
             Room? existingRoom = await _context.Rooms.FirstOrDefaultAsync(r => r.Id == id);
 
             if (existingRoom == null)
                 return NotFound();
 
-            existingRoom.Name = room.Name;
+            if (await _context.Rooms.AnyAsync(r => r.Name == room.Name && r.Id != existingRoom.Id))
+                return Conflict("Room with that name already exists!");
+
+            _mapper.Map(room, existingRoom);
             await _context.SaveChangesAsync();
 
             return NoContent();

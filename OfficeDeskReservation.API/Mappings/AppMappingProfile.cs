@@ -13,8 +13,8 @@ namespace OfficeDeskReservation.API.Mappings
                 .ForMember(dest => dest.RoomName,
                            opt => opt.MapFrom(src => src.Room!.Name));
 
-            CreateMap<Room, RoomDto>();
             CreateMap<RoomDto, Room>();
+            CreateMap<Room, RoomResponseDto>();
 
             CreateMap<UserDto, User>();
             CreateMap<User, UserDto>();
