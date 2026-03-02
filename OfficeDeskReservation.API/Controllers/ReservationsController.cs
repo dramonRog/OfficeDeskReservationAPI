@@ -22,34 +22,47 @@ namespace OfficeDeskReservation.API.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<List<ReservationDto>>> GetAllReservationsAsync()
+        public async Task<ActionResult<List<ReservationResponseDto>>> GetAllReservationsAsync()
         {
-            List<Reservation> reservations = await _context.Reservations.ToListAsync();
-            return Ok(_mapper.Map<List<ReservationDto>>(reservations));
+            List<Reservation> reservations = await _context.Reservations
+                .Include(r => r.User)
+                .Include(r => r.Desk)
+                    .ThenInclude(d => d.Room)
+                .ToListAsync();
+
+            return Ok(_mapper.Map<List<ReservationResponseDto>>(reservations));
         }
 
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ReservationDto>> GetReservationByIdAsync(int id)
+        public async Task<ActionResult<ReservationResponseDto>> GetReservationByIdAsync(int id)
         {
-            Reservation? reservation = await _context.Reservations.FirstOrDefaultAsync(r => r.Id == id);
+            Reservation? reservation = await _context.Reservations
+                .Include(r => r.User)
+                .Include(r => r.Desk)
+                    .ThenInclude(d => d.Room)
+                .FirstOrDefaultAsync(r => r.Id == id);
 
             if (reservation == null)
                 return NotFound();
 
-            return Ok(_mapper.Map<ReservationDto>(reservation));
+            return Ok(_mapper.Map<ReservationResponseDto>(reservation));
         }
 
 
         [HttpPost]
-        public async Task<ActionResult<ReservationDto>> PostReservationAsync([FromBody] ReservationDto reservation)
+        public async Task<ActionResult<ReservationResponseDto>> PostReservationAsync([FromBody] ReservationDto reservation)
         {
             if (reservation.StartTime < DateTime.Now || reservation.StartTime >= reservation.EndTime)
                 return BadRequest("Invalid dates. Start time must be in the future and before the end time.");
 
-            if (!await _context.Users.AnyAsync(u => u.Id == reservation.UserId))
+            User? existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == reservation.UserId);
+            if (existingUser == null)
                 return NotFound("No user with such ID");
-            if (!await _context.Desks.AnyAsync(d => d.Id == reservation.DeskId))
+            Desk? existingDesk = await _context.Desks
+                .Include(d => d.Room)
+                .FirstOrDefaultAsync(d => d.Id == reservation.DeskId);
+            if (existingDesk == null)
                 return NotFound("No desk with such ID");
 
             bool isOverlapping = await _context.Reservations.AnyAsync(r =>
@@ -62,21 +75,21 @@ namespace OfficeDeskReservation.API.Controllers
                 return Conflict("Desk is already taken for the selected period!");
 
             Reservation newReservation = _mapper.Map<Reservation>(reservation);
+            newReservation.User = existingUser;
+            newReservation.Desk = existingDesk;
+
             _context.Reservations.Add(newReservation);
             await _context.SaveChangesAsync();
 
-            _mapper.Map(newReservation, reservation);
+            ReservationResponseDto responseReservation = _mapper.Map<ReservationResponseDto>(newReservation);
 
-            return CreatedAtAction("GetReservationById", new { id = reservation.Id }, reservation);
+            return CreatedAtAction("GetReservationById", new { id = responseReservation.Id }, responseReservation);
         }
 
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutReservationAsync(int id, [FromBody] ReservationDto reservation)
         {
-            if (id != reservation.Id)
-                return BadRequest("URL ID doesn't match with body ID.");
-
             Reservation? existingReservation = await _context.Reservations.FirstOrDefaultAsync(r => r.Id == id);
             if (existingReservation == null)
                 return NotFound("No reservation with such ID.");
