@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using OfficeDeskReservation.API.Data;
 using OfficeDeskReservation.API.Dtos.Rooms;
 using OfficeDeskReservation.API.Models;
+using OfficeDeskReservation.API.Services.Interfaces;
 
 namespace OfficeDeskReservation.API.Controllers
 {
@@ -11,26 +12,18 @@ namespace OfficeDeskReservation.API.Controllers
     [Route("api/[controller]")]
     public class RoomsController : ControllerBase
     {
-        private readonly AppDbContext _context;
-        private readonly IMapper _mapper;
+        private readonly IRoomService _service;
 
-        public RoomsController(AppDbContext context, IMapper mapper)
+        public RoomsController(IRoomService service)
         {
-            _context = context;
-            _mapper = mapper;
+            _service = service;
         }
 
 
         [HttpGet]
         public async Task<ActionResult<List<RoomResponseDto>>> GetRoomsAsync()
         {
-            List<Room> rooms = await _context.Rooms
-                .Include(r => r.Desks)
-                    .ThenInclude(d => d.Reservations)
-                        .ThenInclude(res => res.User)
-                .ToListAsync();
-            List<RoomResponseDto> roomsDtos = _mapper.Map<List<RoomResponseDto>>(rooms);
-
+            List<RoomResponseDto> roomsDtos = await _service.GetAllRoomsAsync();
             return Ok(roomsDtos);
         }
 
@@ -38,71 +31,60 @@ namespace OfficeDeskReservation.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<RoomResponseDto>> GetRoomByIdAsync(int id)
         {
-            Room? existingRoom = await _context.Rooms
-                .Include(r => r.Desks)
-                    .ThenInclude(d => d.Reservations)
-                        .ThenInclude(res => res.User)
-                .FirstOrDefaultAsync(r => r.Id == id);
+            RoomResponseDto? response = await _service.GetRoomByIdAsync(id);
 
-            if (existingRoom == null)
+            if (response == null)
                 return NotFound();
 
-            RoomResponseDto roomDto = _mapper.Map<RoomResponseDto>(existingRoom);
-
-            return Ok(roomDto);
+            return Ok(response);
         }
 
 
         [HttpPost]
         public async Task<ActionResult<RoomResponseDto>> PostRoomAsync([FromBody] RoomDto room) 
         {
-            if (await _context.Rooms.AnyAsync(r => r.Name == room.Name))
-                return Conflict("Room with this name already exists.");
-
-            Room result = _mapper.Map<Room>(room);
-
-            _context.Rooms.Add(result);
-            await _context.SaveChangesAsync();
-
-            RoomResponseDto response = _mapper.Map<RoomResponseDto>(result);
-
-            return CreatedAtAction("GetRoomById", new { id = response.Id }, response);
+            try
+            {
+                RoomResponseDto? response = await _service.CreateRoomAsync(room);
+                return CreatedAtAction("GetRoomById", new { id = response.Id }, response);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
         }
 
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteByIdAsync(int id)
         {
-            Room? room = await _context.Rooms.Include(r => r.Desks).FirstOrDefaultAsync(r => r.Id == id);
-
-            if (room == null)
-                return NotFound();
-
-            if (room.Desks.Any())
-                return BadRequest("This room can't be deleted, as it contains desks.");
-
-            _context.Rooms.Remove(room);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            try
+            {
+                if (await _service.DeleteRoomAsync(id))
+                    return NoContent();
+                else
+                    return NotFound("No room with that ID.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
         }
 
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutRoomAsync(int id, [FromBody] RoomDto room)
         {
-            Room? existingRoom = await _context.Rooms.FirstOrDefaultAsync(r => r.Id == id);
-
-            if (existingRoom == null)
-                return NotFound();
-
-            if (await _context.Rooms.AnyAsync(r => r.Name == room.Name && r.Id != existingRoom.Id))
-                return Conflict("Room with that name already exists!");
-
-            _mapper.Map(room, existingRoom);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            try
+            {
+                if (await _service.UpdateRoomAsync(id, room))
+                    return NoContent();
+                return NotFound("No room with that ID.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
         }
     }
 }
