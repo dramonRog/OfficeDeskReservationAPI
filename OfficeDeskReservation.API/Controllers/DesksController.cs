@@ -23,9 +23,13 @@ namespace OfficeDeskReservation.API.Controllers
         [HttpGet]
         public async Task<ActionResult<List<DeskResponseDto>>> GetDesksAsync()
         {
-            List<Desk> desks = await _context.Desks.Include(d => d.Room).ToListAsync();
-            List<DeskResponseDto> desksDtos = _mapper.Map<List<DeskResponseDto>>(desks);
+            List<Desk> desks = await _context.Desks
+                .Include(d => d.Room)
+                .Include(d => d.Reservations)
+                    .ThenInclude(r => r.User)
+                .ToListAsync();
 
+            List<DeskResponseDto> desksDtos = _mapper.Map<List<DeskResponseDto>>(desks);
             return Ok(desksDtos);
         }
 
@@ -33,7 +37,11 @@ namespace OfficeDeskReservation.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<DeskResponseDto>> GetDeskByIdAsync(int id)
         {
-            Desk? existingDesk = await _context.Desks.Include(d => d.Room).FirstOrDefaultAsync(desk => desk.Id == id);
+            Desk? existingDesk = await _context.Desks
+                .Include(d => d.Room)
+                .Include(d => d.Reservations)
+                    .ThenInclude(r => r.User)
+                .FirstOrDefaultAsync(desk => desk.Id == id);
 
             if (existingDesk == null)
                 return NotFound();
@@ -87,10 +95,13 @@ namespace OfficeDeskReservation.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDeskByIdAsync(int id)
         {
-            Desk? deskToRemove = await _context.Desks.FirstOrDefaultAsync(d => d.Id == id);
+            Desk? deskToRemove = await _context.Desks.Include(d => d.Reservations).FirstOrDefaultAsync(d => d.Id == id);
 
             if (deskToRemove == null)
                 return NotFound();
+
+            if (deskToRemove.Reservations.Any())
+                return Conflict("Cannot delete this desk because it has existing reservations.");
 
             _context.Desks.Remove(deskToRemove);
             await _context.SaveChangesAsync();
