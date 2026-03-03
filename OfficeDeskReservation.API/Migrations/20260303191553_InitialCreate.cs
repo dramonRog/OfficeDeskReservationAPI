@@ -34,8 +34,9 @@ namespace OfficeDeskReservation.API.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    IsAdmin = table.Column<bool>(type: "bit", nullable: false)
+                    Role = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -101,8 +102,8 @@ namespace OfficeDeskReservation.API.Migrations
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "Email", "FirstName", "IsAdmin", "LastName" },
-                values: new object[] { 1, "roman.buchynskyi2006@gmail.com", "Roman", true, "Buchynskyi" });
+                columns: new[] { "Id", "Email", "FirstName", "LastName", "PasswordHash", "Role" },
+                values: new object[] { 1, "roman.buchynskyi2006@gmail.com", "Roman", "Buchynskyi", "", 2 });
 
             migrationBuilder.InsertData(
                 table: "Desks",

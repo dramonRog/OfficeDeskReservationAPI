@@ -12,7 +12,7 @@ using OfficeDeskReservation.API.Data;
 namespace OfficeDeskReservation.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260228141449_InitialCreate")]
+    [Migration("20260303191553_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -141,12 +141,16 @@ namespace OfficeDeskReservation.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsAdmin")
-                        .HasColumnType("bit");
-
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -161,8 +165,9 @@ namespace OfficeDeskReservation.API.Migrations
                             Id = 1,
                             Email = "roman.buchynskyi2006@gmail.com",
                             FirstName = "Roman",
-                            IsAdmin = true,
-                            LastName = "Buchynskyi"
+                            LastName = "Buchynskyi",
+                            PasswordHash = "",
+                            Role = 2
                         });
                 });
 
