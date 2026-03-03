@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using OfficeDeskReservation.API.Data;
 using OfficeDeskReservation.API.Dtos.Reservations;
-using OfficeDeskReservation.API.Models;
+using OfficeDeskReservation.API.Services.Interfaces;
 
 namespace OfficeDeskReservation.API.Controllers
 {
@@ -11,127 +9,86 @@ namespace OfficeDeskReservation.API.Controllers
     [ApiController]
     public class ReservationsController : ControllerBase
     {
-        private readonly AppDbContext _context;
-        private readonly IMapper _mapper;
-
-        public ReservationsController(AppDbContext context, IMapper mapper)
+        private readonly IReservationService _service;
+        public ReservationsController(IReservationService service)
         {
-            _context = context;
-            _mapper = mapper;
+            _service = service;
         }
 
 
         [HttpGet]
         public async Task<ActionResult<List<ReservationResponseDto>>> GetAllReservationsAsync()
         {
-            List<Reservation> reservations = await _context.Reservations
-                .Include(r => r.User)
-                .Include(r => r.Desk)
-                    .ThenInclude(d => d.Room)
-                .ToListAsync();
-
-            return Ok(_mapper.Map<List<ReservationResponseDto>>(reservations));
+            List<ReservationResponseDto> reservations = await _service.GetAllReservationsAsync();
+            return Ok(reservations);
         }
 
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ReservationResponseDto>> GetReservationByIdAsync(int id)
         {
-            Reservation? reservation = await _context.Reservations
-                .Include(r => r.User)
-                .Include(r => r.Desk)
-                    .ThenInclude(d => d.Room)
-                .FirstOrDefaultAsync(r => r.Id == id);
+            ReservationResponseDto? reservation = await _service.GetReservationByIdAsync(id);
 
             if (reservation == null)
                 return NotFound();
 
-            return Ok(_mapper.Map<ReservationResponseDto>(reservation));
+            return Ok(reservation);
         }
 
 
         [HttpPost]
         public async Task<ActionResult<ReservationResponseDto>> PostReservationAsync([FromBody] ReservationDto reservation)
         {
-            if (reservation.StartTime < DateTime.Now || reservation.StartTime >= reservation.EndTime)
-                return BadRequest("Invalid dates. Start time must be in the future and before the end time.");
-
-            User? existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == reservation.UserId);
-            if (existingUser == null)
-                return NotFound("No user with such ID");
-            Desk? existingDesk = await _context.Desks
-                .Include(d => d.Room)
-                .FirstOrDefaultAsync(d => d.Id == reservation.DeskId);
-            if (existingDesk == null)
-                return NotFound("No desk with such ID");
-
-            bool isOverlapping = await _context.Reservations.AnyAsync(r =>
-                r.DeskId == reservation.DeskId &&
-                r.StartTime < reservation.EndTime &&
-                r.EndTime > reservation.StartTime
-            );
-
-            if (isOverlapping)
-                return Conflict("Desk is already taken for the selected period!");
-
-            Reservation newReservation = _mapper.Map<Reservation>(reservation);
-            newReservation.User = existingUser;
-            newReservation.Desk = existingDesk;
-
-            _context.Reservations.Add(newReservation);
-            await _context.SaveChangesAsync();
-
-            ReservationResponseDto responseReservation = _mapper.Map<ReservationResponseDto>(newReservation);
-
-            return CreatedAtAction("GetReservationById", new { id = responseReservation.Id }, responseReservation);
+            try
+            {
+                ReservationResponseDto? responseReservation = await _service.CreateReservationAsync(reservation);
+                return CreatedAtAction("GetReservationById", new { id = responseReservation?.Id }, responseReservation);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
         }
 
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutReservationAsync(int id, [FromBody] ReservationDto reservation)
         {
-            Reservation? existingReservation = await _context.Reservations.FirstOrDefaultAsync(r => r.Id == id);
-            if (existingReservation == null)
-                return NotFound("No reservation with such ID.");
-
-            if (!await _context.Users.AnyAsync(u => u.Id == reservation.UserId))
-                return NotFound("No user with such ID.");
-
-            if (!await _context.Desks.AnyAsync(d => d.Id == reservation.DeskId))
-                return NotFound("No desk with such ID.");
-
-            if (reservation.StartTime < DateTime.Now || reservation.StartTime >= reservation.EndTime)
-                return BadRequest("Invalid dates. Start time must be in the future and before the end time.");
-
-            bool isOverlapping = await _context.Reservations.AnyAsync(r =>
-                r.Id != id && 
-                r.DeskId == reservation.DeskId &&
-                reservation.StartTime < r.EndTime &&
-                reservation.EndTime > r.StartTime
-            );
-
-            if (isOverlapping)
-                return Conflict("Desk is already taken for the selected period!");
-
-            _mapper.Map(reservation, existingReservation);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            try
+            {
+                if (await _service.UpdateReservationAsync(id, reservation))
+                    return NoContent();
+                return NotFound();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
         }
 
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> RemoveReservationAsync(int id)
         {
-            Reservation? reservation = await _context.Reservations.FirstOrDefaultAsync(r => r.Id == id);
-
-            if (reservation == null)
-                return NotFound();
-
-            _context.Reservations.Remove(reservation);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            if (await _service.DeleteReservationAsync(id))
+                return NoContent();
+            return NotFound();
         }
     }
 }

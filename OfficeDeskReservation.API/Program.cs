@@ -22,6 +22,7 @@ builder.Services.AddControllers()
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IDeskService, DeskService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
 
 builder.Services.AddAutoMapper(cfg => cfg.AddProfile<AppMappingProfile>());
 
