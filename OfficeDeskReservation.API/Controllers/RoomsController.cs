@@ -1,9 +1,5 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using OfficeDeskReservation.API.Data;
+﻿using Microsoft.AspNetCore.Mvc;
 using OfficeDeskReservation.API.Dtos.Rooms;
-using OfficeDeskReservation.API.Models;
 using OfficeDeskReservation.API.Services.Interfaces;
 
 namespace OfficeDeskReservation.API.Controllers
@@ -43,48 +39,27 @@ namespace OfficeDeskReservation.API.Controllers
         [HttpPost]
         public async Task<ActionResult<RoomResponseDto>> PostRoomAsync([FromBody] RoomDto room) 
         {
-            try
-            {
-                RoomResponseDto? response = await _service.CreateRoomAsync(room);
-                return CreatedAtAction("GetRoomById", new { id = response.Id }, response);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Conflict(ex.Message);
-            }
+            RoomResponseDto? response = await _service.CreateRoomAsync(room);
+            return CreatedAtAction("GetRoomById", new { id = response.Id }, response);
         }
 
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteByIdAsync(int id)
         {
-            try
-            {
-                if (await _service.DeleteRoomAsync(id))
-                    return NoContent();
-                else
-                    return NotFound("No room with that ID.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Conflict(ex.Message);
-            }
+            if (await _service.DeleteRoomAsync(id))
+                return NoContent();
+            else
+                return NotFound("No room with that ID.");
         }
 
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutRoomAsync(int id, [FromBody] RoomDto room)
         {
-            try
-            {
-                if (await _service.UpdateRoomAsync(id, room))
-                    return NoContent();
-                return NotFound("No room with that ID.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Conflict(ex.Message);
-            }
+            if (await _service.UpdateRoomAsync(id, room))
+                return NoContent();
+            return NotFound("No room with that ID.");
         }
     }
 }

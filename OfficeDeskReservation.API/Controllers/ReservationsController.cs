@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using OfficeDeskReservation.API.Dtos.Reservations;
 using OfficeDeskReservation.API.Services.Interfaces;
 
@@ -39,47 +38,17 @@ namespace OfficeDeskReservation.API.Controllers
         [HttpPost]
         public async Task<ActionResult<ReservationResponseDto>> PostReservationAsync([FromBody] ReservationDto reservation)
         {
-            try
-            {
-                ReservationResponseDto? responseReservation = await _service.CreateReservationAsync(reservation);
-                return CreatedAtAction("GetReservationById", new { id = responseReservation?.Id }, responseReservation);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Conflict(ex.Message);
-            }
+            ReservationResponseDto? responseReservation = await _service.CreateReservationAsync(reservation);
+            return CreatedAtAction("GetReservationById", new { id = responseReservation?.Id }, responseReservation);
         }
 
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutReservationAsync(int id, [FromBody] ReservationDto reservation)
         {
-            try
-            {
-                if (await _service.UpdateReservationAsync(id, reservation))
-                    return NoContent();
-                return NotFound();
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Conflict(ex.Message);
-            }
+            if (await _service.UpdateReservationAsync(id, reservation))
+                return NoContent();
+            return NotFound();
         }
 
 

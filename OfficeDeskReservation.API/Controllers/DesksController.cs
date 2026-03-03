@@ -1,9 +1,5 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using OfficeDeskReservation.API.Data;
+﻿using Microsoft.AspNetCore.Mvc;
 using OfficeDeskReservation.API.Dtos.Desks;
-using OfficeDeskReservation.API.Models;
 using OfficeDeskReservation.API.Services.Interfaces;
 
 namespace OfficeDeskReservation.API.Controllers
@@ -42,55 +38,26 @@ namespace OfficeDeskReservation.API.Controllers
         [HttpPost]
         public async Task<ActionResult<DeskResponseDto>> PostDeskAsync([FromBody] DeskDto desk)
         {
-            try
-            {
-                DeskResponseDto? responseDesk = await _service.CreateDeskAsync(desk);
-                return CreatedAtAction("GetDeskById", new { id = responseDesk?.Id }, responseDesk);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Conflict(ex.Message);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            DeskResponseDto? responseDesk = await _service.CreateDeskAsync(desk);
+            return CreatedAtAction("GetDeskById", new { id = responseDesk?.Id }, responseDesk);
         }
 
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutDeskAsync(int id, [FromBody] DeskDto desk)
         {
-            try
-            {
-                if (await _service.UpdateDeskAsync(id, desk))
-                    return NoContent();
-                return NotFound();
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Conflict(ex.Message);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            if (await _service.UpdateDeskAsync(id, desk))
+                return NoContent();
+            return NotFound();
         }
 
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDeskByIdAsync(int id)
         {
-            try
-            {
-                if (await _service.DeleteDeskAsync(id))
-                    return NoContent();
-                return NotFound();
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Conflict(ex.Message);
-            }
+            if (await _service.DeleteDeskAsync(id))
+                return NoContent();
+            return NotFound();
         }
     }
 }

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OfficeDeskReservation.API.Data;
 using OfficeDeskReservation.API.Mappings;
+using OfficeDeskReservation.API.Middlewares;
 using OfficeDeskReservation.API.Services.Implementations;
 using OfficeDeskReservation.API.Services.Interfaces;
 
@@ -38,6 +39,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<GlobalExceptionMiddleware>();
+
 app.UseAuthorization();
 app.MapControllers();
 
