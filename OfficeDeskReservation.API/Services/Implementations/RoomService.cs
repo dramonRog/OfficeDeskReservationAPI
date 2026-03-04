@@ -42,9 +42,6 @@ namespace OfficeDeskReservation.API.Services.Implementations
 
         public async Task<RoomResponseDto?> CreateRoomAsync(RoomDto room)
         {
-            if (await _context.Rooms.AnyAsync(r => r.Name == room.Name))
-                throw new InvalidOperationException("Room with that name already exists.");
-
             Room result = _mapper.Map<Room>(room);
             _context.Rooms.Add(result);
             await _context.SaveChangesAsync();
@@ -58,9 +55,6 @@ namespace OfficeDeskReservation.API.Services.Implementations
 
             if (roomToModify == null)
                 return false;
-
-            if (await _context.Rooms.AnyAsync(r => r.Name == room.Name && r.Id != roomToModify.Id))
-                throw new InvalidOperationException("Room with that name already exists.");
 
             _mapper.Map(room, roomToModify);
 
