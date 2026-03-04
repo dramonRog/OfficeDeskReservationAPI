@@ -12,7 +12,7 @@ using OfficeDeskReservation.API.Data;
 namespace OfficeDeskReservation.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260303191553_InitialCreate")]
+    [Migration("20260304114225_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -166,7 +166,7 @@ namespace OfficeDeskReservation.API.Migrations
                             Email = "roman.buchynskyi2006@gmail.com",
                             FirstName = "Roman",
                             LastName = "Buchynskyi",
-                            PasswordHash = "",
+                            PasswordHash = "$2a$11$yd.KkVkY.7aZbonYYJEyt.I6EQKkNyij1Yeln3n616PASq.ix3TCK",
                             Role = 2
                         });
                 });

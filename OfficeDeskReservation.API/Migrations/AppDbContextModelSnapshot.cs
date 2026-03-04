@@ -163,7 +163,7 @@ namespace OfficeDeskReservation.API.Migrations
                             Email = "roman.buchynskyi2006@gmail.com",
                             FirstName = "Roman",
                             LastName = "Buchynskyi",
-                            PasswordHash = "",
+                            PasswordHash = "$2a$11$yd.KkVkY.7aZbonYYJEyt.I6EQKkNyij1Yeln3n616PASq.ix3TCK",
                             Role = 2
                         });
                 });
