@@ -40,14 +40,14 @@ namespace OfficeDeskReservation.API.Services.Implementations
             return reservation == null ? null : _mapper.Map<ReservationResponseDto>(reservation);
         }
 
-        public async Task<ReservationResponseDto?> CreateReservationAsync(ReservationDto reservation)
+        public async Task<ReservationResponseDto?> CreateReservationAsync(ReservationDto reservation, int userId)
         {
             if (reservation.StartTime < DateTime.Now || reservation.StartTime >= reservation.EndTime)
                 throw new ArgumentException("Invalid dates. Start time must be in the future and before the end time");
 
-            User? existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == reservation.UserId);
+            User? existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             if (existingUser == null)
-                throw new KeyNotFoundException("No user with such ID.");
+                throw new KeyNotFoundException("User from token not found in database.");
 
             Desk? existingDesk = await _context.Desks
                 .Include(d => d.Room)
@@ -66,6 +66,7 @@ namespace OfficeDeskReservation.API.Services.Implementations
                 throw new InvalidOperationException("Desk is already taken for that period.");
 
             Reservation newReservation = _mapper.Map<Reservation>(reservation);
+            newReservation.UserId = userId;
             newReservation.User = existingUser;
             newReservation.Desk = existingDesk;
 
@@ -77,21 +78,21 @@ namespace OfficeDeskReservation.API.Services.Implementations
 
         public async Task<bool> UpdateReservationAsync(int id, ReservationDto reservation)
         {
-            Reservation? existingReservation = await _context.Reservations.FirstOrDefaultAsync(r => r.Id == id);
+            if (reservation.StartTime < DateTime.Now || reservation.StartTime >= reservation.EndTime)
+                throw new ArgumentException("Invalid dates. Start time must be in the future and before the end time.");
 
+            Reservation? existingReservation = await _context.Reservations.FirstOrDefaultAsync(r => r.Id == id);
             if (existingReservation == null)
                 return false;
 
-            if (!await _context.Users.AnyAsync(u => u.Id == reservation.UserId))
+            if (!await _context.Users.AnyAsync(u => u.Id == existingReservation.UserId))
                 throw new KeyNotFoundException("No user with such ID.");
 
             if (!await _context.Desks.AnyAsync(d => d.Id == reservation.DeskId))
                 throw new KeyNotFoundException("No desk with such Id.");
 
-            if (reservation.StartTime < DateTime.Now || reservation.StartTime >= reservation.EndTime)
-                throw new ArgumentException("Invalid dates. Start time must be in the future and before the end time.");
-
             bool isOverlapping = await _context.Reservations.AnyAsync(r =>
+                r.Id != id &&
                 r.DeskId == reservation.DeskId &&
                 r.StartTime < reservation.EndTime &&
                 r.EndTime > reservation.StartTime

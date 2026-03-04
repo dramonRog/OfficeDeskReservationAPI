@@ -6,7 +6,7 @@ namespace OfficeDeskReservation.API.Services.Interfaces
     {
         Task<List<ReservationResponseDto>> GetAllReservationsAsync();
         Task<ReservationResponseDto?> GetReservationByIdAsync(int id);
-        Task<ReservationResponseDto?> CreateReservationAsync(ReservationDto reservationDto);
+        Task<ReservationResponseDto?> CreateReservationAsync(ReservationDto reservationDto, int userId);
         Task<bool> UpdateReservationAsync(int id, ReservationDto reservationDto);
         Task<bool> DeleteReservationAsync(int id);
     }
