@@ -47,6 +47,7 @@ namespace OfficeDeskReservation.API.Controllers
         }
 
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> RemoveUserByIdAsync(int id)
         {

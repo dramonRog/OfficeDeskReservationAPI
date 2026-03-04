@@ -64,7 +64,7 @@ namespace OfficeDeskReservation.API.Controllers
             int currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             string? userRole = User.FindFirstValue(ClaimTypes.Role);
 
-            if (existingReservation.UserId != currentUserId && userRole == "User")
+            if (existingReservation.UserId != currentUserId && userRole == Role.User.ToString())
                 return Forbid();
 
             if (await _service.UpdateReservationAsync(id, reservation))
@@ -83,7 +83,7 @@ namespace OfficeDeskReservation.API.Controllers
             int currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             string? userRole = User.FindFirstValue(ClaimTypes.Role);
 
-            if (reservation.UserId != currentUserId && userRole == "User")
+            if (reservation.UserId != currentUserId && userRole == Role.User.ToString())
                 return Forbid();
 
             await _service.DeleteReservationAsync(id);
