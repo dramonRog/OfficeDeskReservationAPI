@@ -50,7 +50,7 @@ namespace OfficeDeskReservation.API.Data
             );
 
             modelBuilder.Entity<User>().HasData(
-                new User { Id = 1, FirstName = "Roman", LastName = "Buchynskyi", Email = "roman.buchynskyi2006@gmail.com", IsAdmin = true }
+                new User { Id = 1, FirstName = "Roman", LastName = "Buchynskyi", Email = "roman.buchynskyi2006@gmail.com", Role = Role.Admin }
             );
         }
     }

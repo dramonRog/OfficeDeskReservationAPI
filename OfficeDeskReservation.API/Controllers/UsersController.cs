@@ -34,14 +34,6 @@ namespace OfficeDeskReservation.API.Controllers
         }
 
 
-        [HttpPost]
-        public async Task<ActionResult<UserResponseDto>> PostUserAsync([FromBody] UserDto user)
-        {
-            UserResponseDto? result = await _service.CreateUserAsync(user);
-            return CreatedAtAction("GetUserById", new { id = result.Id }, result);
-        }
-
-
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUserAsync(int id, [FromBody] UserDto user)
         {

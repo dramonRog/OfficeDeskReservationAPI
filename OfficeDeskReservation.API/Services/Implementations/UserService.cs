@@ -41,21 +41,6 @@ namespace OfficeDeskReservation.API.Services.Implementations
             return user == null ? null : _mapper.Map<UserResponseDto>(user);   
         }
 
-        public async Task<UserResponseDto?> CreateUserAsync(UserDto user)
-        {
-            if (await _context.Users.AnyAsync(u => u.FirstName == user.FirstName && u.LastName == user.LastName))
-                throw new InvalidOperationException("This user already exists.");
-
-            if (await _context.Users.AnyAsync(u => u.Email == user.Email))
-                throw new InvalidOperationException("User with such email already exists.");
-
-            User newUser = _mapper.Map<User>(user);
-            _context.Users.Add(newUser);
-            await _context.SaveChangesAsync();
-
-            return _mapper.Map<UserResponseDto>(newUser);
-        }
-
         public async Task<bool> UpdateUserAsync(int id, UserDto user)
         {
             User? existingUser = await _context.Users.Include(u => u.Reservations).FirstOrDefaultAsync(u => u.Id == id);
