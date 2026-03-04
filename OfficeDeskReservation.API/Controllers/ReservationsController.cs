@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OfficeDeskReservation.API.Dtos.Reservations;
 using OfficeDeskReservation.API.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace OfficeDeskReservation.API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ReservationsController : ControllerBase

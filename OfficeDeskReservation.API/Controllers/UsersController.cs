@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using OfficeDeskReservation.API.Dtos.Users;
 using OfficeDeskReservation.API.Services.Interfaces;
 
 namespace OfficeDeskReservation.API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
@@ -15,6 +17,7 @@ namespace OfficeDeskReservation.API.Controllers
         }
 
 
+        [Authorize(Roles = "Admin,Manager")]
         [HttpGet]
         public async Task<ActionResult<List<UserResponseDto>>> GetUsersAsync()
         {
@@ -34,6 +37,7 @@ namespace OfficeDeskReservation.API.Controllers
         }
 
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUserAsync(int id, [FromBody] UserDto user)
         {

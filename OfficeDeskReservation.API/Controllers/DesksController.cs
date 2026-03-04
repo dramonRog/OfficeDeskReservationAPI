@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OfficeDeskReservation.API.Dtos.Desks;
 using OfficeDeskReservation.API.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace OfficeDeskReservation.API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class DesksController : ControllerBase
@@ -35,6 +37,7 @@ namespace OfficeDeskReservation.API.Controllers
         }
 
 
+        [Authorize(Roles = "Admin,Manager")]
         [HttpPost]
         public async Task<ActionResult<DeskResponseDto>> PostDeskAsync([FromBody] DeskDto desk)
         {
@@ -43,6 +46,7 @@ namespace OfficeDeskReservation.API.Controllers
         }
 
 
+        [Authorize(Roles = "Admin,Manager")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutDeskAsync(int id, [FromBody] DeskDto desk)
         {
@@ -52,6 +56,7 @@ namespace OfficeDeskReservation.API.Controllers
         }
 
 
+        [Authorize(Roles = "Admin,Manager")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDeskByIdAsync(int id)
         {
