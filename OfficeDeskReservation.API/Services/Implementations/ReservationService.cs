@@ -42,9 +42,6 @@ namespace OfficeDeskReservation.API.Services.Implementations
 
         public async Task<ReservationResponseDto?> CreateReservationAsync(ReservationDto reservation, int userId)
         {
-            if (reservation.StartTime < DateTime.Now || reservation.StartTime >= reservation.EndTime)
-                throw new ArgumentException("Invalid dates. Start time must be in the future and before the end time");
-
             User? existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             if (existingUser == null)
                 throw new KeyNotFoundException("User from token not found in database.");
@@ -78,9 +75,6 @@ namespace OfficeDeskReservation.API.Services.Implementations
 
         public async Task<bool> UpdateReservationAsync(int id, ReservationDto reservation)
         {
-            if (reservation.StartTime < DateTime.Now || reservation.StartTime >= reservation.EndTime)
-                throw new ArgumentException("Invalid dates. Start time must be in the future and before the end time.");
-
             Reservation? existingReservation = await _context.Reservations.FirstOrDefaultAsync(r => r.Id == id);
             if (existingReservation == null)
                 return false;
