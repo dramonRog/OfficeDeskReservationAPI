@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using OfficeDeskReservation.API.Data;
 using OfficeDeskReservation.API.Dtos.Reservations;
 using OfficeDeskReservation.API.Models;
+using OfficeDeskReservation.API.Pagination;
 using OfficeDeskReservation.API.Services.Interfaces;
 
 namespace OfficeDeskReservation.API.Services.Implementations
@@ -18,15 +19,28 @@ namespace OfficeDeskReservation.API.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<List<ReservationResponseDto>> GetAllReservationsAsync()
+        public async Task<PagedResult<ReservationResponseDto>> GetAllReservationsAsync(QueryParameters queryParameters)
         {
-            List<Reservation> reservations = await _context.Reservations
+            var query = _context.Reservations
                 .Include(r => r.User)
                 .Include(r => r.Desk)
                     .ThenInclude(d => d.Room)
+                .AsQueryable();
+
+            int totalCount = await query.CountAsync();
+
+            List<Reservation> reservations = await query
+                .Skip((queryParameters.PageNumber - 1) * queryParameters.PageSize)
+                .Take(queryParameters.PageSize)
                 .ToListAsync();
 
-            return _mapper.Map<List<ReservationResponseDto>>(reservations);
+            return new PagedResult<ReservationResponseDto>
+            {
+                Items = _mapper.Map<List<ReservationResponseDto>>(reservations),
+                TotalCount = totalCount,
+                PageNumber = queryParameters.PageNumber,
+                PageSize = queryParameters.PageSize
+            };
         }
 
         public async Task<ReservationResponseDto?> GetReservationByIdAsync(int id)

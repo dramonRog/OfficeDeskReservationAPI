@@ -4,6 +4,7 @@ using OfficeDeskReservation.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using OfficeDeskReservation.API.Models;
+using OfficeDeskReservation.API.Pagination;
 
 namespace OfficeDeskReservation.API.Controllers
 {
@@ -20,9 +21,9 @@ namespace OfficeDeskReservation.API.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<List<ReservationResponseDto>>> GetAllReservationsAsync()
+        public async Task<ActionResult<PagedResult<ReservationResponseDto>>> GetAllReservationsAsync([FromQuery] QueryParameters queryParameters)
         {
-            List<ReservationResponseDto> reservations = await _service.GetAllReservationsAsync();
+            PagedResult<ReservationResponseDto> reservations = await _service.GetAllReservationsAsync(queryParameters);
             return Ok(reservations);
         }
 

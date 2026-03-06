@@ -1,10 +1,11 @@
 ﻿using OfficeDeskReservation.API.Dtos.Reservations;
+using OfficeDeskReservation.API.Pagination;
 
 namespace OfficeDeskReservation.API.Services.Interfaces
 {
     public interface IReservationService
     {
-        Task<List<ReservationResponseDto>> GetAllReservationsAsync();
+        Task<PagedResult<ReservationResponseDto>> GetAllReservationsAsync(QueryParameters queryParameters);
         Task<ReservationResponseDto?> GetReservationByIdAsync(int id);
         Task<ReservationResponseDto?> CreateReservationAsync(ReservationDto reservationDto, int userId);
         Task<bool> UpdateReservationAsync(int id, ReservationDto reservationDto);
