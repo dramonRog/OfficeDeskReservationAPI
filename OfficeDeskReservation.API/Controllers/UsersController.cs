@@ -20,7 +20,7 @@ namespace OfficeDeskReservation.API.Controllers
 
         [Authorize(Roles = "Admin,Manager")]
         [HttpGet]
-        public async Task<ActionResult<PagedResult<UserResponseDto>>> GetUsersAsync([FromQuery] QueryParameters queryParameters)
+        public async Task<ActionResult<PagedResult<UserResponseDto>>> GetUsersAsync([FromQuery] UserQueryParameters queryParameters)
         {
             PagedResult<UserResponseDto> users = await _service.GetUsersAsync(queryParameters);
             return Ok(users);

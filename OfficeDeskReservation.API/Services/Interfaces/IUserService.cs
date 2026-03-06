@@ -5,7 +5,7 @@ namespace OfficeDeskReservation.API.Services.Interfaces
 {
     public interface IUserService
     {
-        Task<PagedResult<UserResponseDto>> GetUsersAsync(QueryParameters queryParameters);
+        Task<PagedResult<UserResponseDto>> GetUsersAsync(UserQueryParameters queryParameters);
         Task<UserResponseDto?> GetUserByIdAsync(int id);
         Task<bool> UpdateUserAsync(int id, UserDto userDto);
         Task<bool> DeleteUserAsync(int id);

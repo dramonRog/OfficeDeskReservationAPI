@@ -20,13 +20,22 @@ namespace OfficeDeskReservation.API.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<PagedResult<UserResponseDto>> GetUsersAsync(QueryParameters queryParameters)
+        public async Task<PagedResult<UserResponseDto>> GetUsersAsync(UserQueryParameters queryParameters)
         {
             var query = _context.Users
                 .Include(u => u.Reservations)
                     .ThenInclude(r => r.Desk)
                         .ThenInclude(d => d.Room)
                 .AsQueryable();
+
+            if (queryParameters.FirstNameTerm != null)
+                query = query.Where(u => u.FirstName.StartsWith(queryParameters.FirstNameTerm));
+
+            if (queryParameters.LastNameTerm != null)
+                query = query.Where(u => u.LastName.StartsWith(queryParameters.LastNameTerm));
+
+            if (queryParameters.EmailTerm != null)
+                query = query.Where(u => u.Email.StartsWith(queryParameters.EmailTerm));
 
             int totalCount = await query.CountAsync();
 
