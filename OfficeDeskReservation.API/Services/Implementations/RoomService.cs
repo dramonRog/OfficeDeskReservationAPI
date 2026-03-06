@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using OfficeDeskReservation.API.Data;
 using OfficeDeskReservation.API.Dtos.Rooms;
 using OfficeDeskReservation.API.Models;
+using OfficeDeskReservation.API.Pagination;
 using OfficeDeskReservation.API.Services.Interfaces;
 
 namespace OfficeDeskReservation.API.Services.Implementations
@@ -18,15 +19,28 @@ namespace OfficeDeskReservation.API.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<List<RoomResponseDto>> GetAllRoomsAsync()
+        public async Task<PagedResult<RoomResponseDto>> GetAllRoomsAsync(QueryParameters queryParameters)
         {
-            List<Room> rooms = await _context.Rooms
+            var query = _context.Rooms
                 .Include(r => r.Desks)
                     .ThenInclude(d => d.Reservations)
                         .ThenInclude(res => res.User)
+                .AsQueryable();
+
+            int totalCount = await query.CountAsync();
+
+            List<Room> rooms = await query
+                .Skip((queryParameters.PageNumber - 1) * queryParameters.PageSize)
+                .Take(queryParameters.PageSize)
                 .ToListAsync();
 
-            return _mapper.Map<List<RoomResponseDto>>(rooms);
+            return new PagedResult<RoomResponseDto>
+            {
+                Items = _mapper.Map<List<RoomResponseDto>>(rooms),
+                TotalCount = totalCount,
+                PageNumber = queryParameters.PageNumber,
+                PageSize = queryParameters.PageSize
+            };
         }
 
         public async Task<RoomResponseDto?> GetRoomByIdAsync(int id)

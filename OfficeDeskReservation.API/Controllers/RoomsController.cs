@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OfficeDeskReservation.API.Dtos.Rooms;
+using OfficeDeskReservation.API.Pagination;
 using OfficeDeskReservation.API.Services.Interfaces;
 
 namespace OfficeDeskReservation.API.Controllers
@@ -19,9 +20,9 @@ namespace OfficeDeskReservation.API.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<List<RoomResponseDto>>> GetRoomsAsync()
+        public async Task<ActionResult<PagedResult<RoomResponseDto>>> GetRoomsAsync([FromQuery] QueryParameters queryParameters)
         {
-            List<RoomResponseDto> roomsDtos = await _service.GetAllRoomsAsync();
+            PagedResult<RoomResponseDto> roomsDtos = await _service.GetAllRoomsAsync(queryParameters);
             return Ok(roomsDtos);
         }
 
