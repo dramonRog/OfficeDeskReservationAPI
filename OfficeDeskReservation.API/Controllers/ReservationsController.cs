@@ -21,7 +21,7 @@ namespace OfficeDeskReservation.API.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<PagedResult<ReservationResponseDto>>> GetAllReservationsAsync([FromQuery] QueryParameters queryParameters)
+        public async Task<ActionResult<PagedResult<ReservationResponseDto>>> GetAllReservationsAsync([FromQuery] ReservationQueryParameters queryParameters)
         {
             PagedResult<ReservationResponseDto> reservations = await _service.GetAllReservationsAsync(queryParameters);
             return Ok(reservations);

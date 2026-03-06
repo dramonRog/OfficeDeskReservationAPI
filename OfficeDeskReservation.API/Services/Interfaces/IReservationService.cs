@@ -5,7 +5,7 @@ namespace OfficeDeskReservation.API.Services.Interfaces
 {
     public interface IReservationService
     {
-        Task<PagedResult<ReservationResponseDto>> GetAllReservationsAsync(QueryParameters queryParameters);
+        Task<PagedResult<ReservationResponseDto>> GetAllReservationsAsync(ReservationQueryParameters queryParameters);
         Task<ReservationResponseDto?> GetReservationByIdAsync(int id);
         Task<ReservationResponseDto?> CreateReservationAsync(ReservationDto reservationDto, int userId);
         Task<bool> UpdateReservationAsync(int id, ReservationDto reservationDto);
