@@ -19,7 +19,7 @@ namespace OfficeDeskReservation.API.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<PagedResult<DeskResponseDto>>> GetDesksAsync([FromQuery] QueryParameters queryParameters)
+        public async Task<ActionResult<PagedResult<DeskResponseDto>>> GetDesksAsync([FromQuery] DeskQueryParameters queryParameters)
         {
             PagedResult<DeskResponseDto> desksDtos = await _service.GetDesksAsync(queryParameters);
             return Ok(desksDtos);
