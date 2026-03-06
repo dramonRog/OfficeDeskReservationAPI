@@ -5,7 +5,7 @@ namespace OfficeDeskReservation.API.Services.Interfaces
 {
     public interface IRoomService
     {
-        Task<PagedResult<RoomResponseDto>> GetAllRoomsAsync(QueryParameters queryParameters);
+        Task<PagedResult<RoomResponseDto>> GetAllRoomsAsync(RoomQueryParameters queryParameters);
         Task<RoomResponseDto?> GetRoomByIdAsync(int id);
         Task<RoomResponseDto?> CreateRoomAsync(RoomDto roomDto);
         Task<bool> UpdateRoomAsync(int id, RoomDto roomDto);

@@ -19,13 +19,16 @@ namespace OfficeDeskReservation.API.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<PagedResult<RoomResponseDto>> GetAllRoomsAsync(QueryParameters queryParameters)
+        public async Task<PagedResult<RoomResponseDto>> GetAllRoomsAsync(RoomQueryParameters queryParameters)
         {
             var query = _context.Rooms
                 .Include(r => r.Desks)
                     .ThenInclude(d => d.Reservations)
                         .ThenInclude(res => res.User)
                 .AsQueryable();
+
+            if (queryParameters.SearchTerm != null)
+                query = query.Where(r => r.Name.Contains(queryParameters.SearchTerm));
 
             int totalCount = await query.CountAsync();
 

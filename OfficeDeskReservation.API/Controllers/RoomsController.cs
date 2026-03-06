@@ -20,7 +20,7 @@ namespace OfficeDeskReservation.API.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<PagedResult<RoomResponseDto>>> GetRoomsAsync([FromQuery] QueryParameters queryParameters)
+        public async Task<ActionResult<PagedResult<RoomResponseDto>>> GetRoomsAsync([FromQuery] RoomQueryParameters queryParameters)
         {
             PagedResult<RoomResponseDto> roomsDtos = await _service.GetAllRoomsAsync(queryParameters);
             return Ok(roomsDtos);
