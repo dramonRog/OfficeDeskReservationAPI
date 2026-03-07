@@ -7,7 +7,7 @@ namespace OfficeDeskReservation.API.Validators
 {
     public class UserDtoValidator : AbstractValidator<UserDto>
     {
-        public UserDtoValidator(AppDbContext context)
+        public UserDtoValidator()
         {
             RuleFor(u => u.FirstName)
                 .NotEmpty().WithMessage("First name is required.");

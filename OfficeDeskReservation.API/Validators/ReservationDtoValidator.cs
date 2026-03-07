@@ -16,7 +16,7 @@ namespace OfficeDeskReservation.API.Validators
 
             RuleFor(r => r.EndTime)
                 .NotEmpty().WithMessage("End time is required.")
-                .GreaterThan(DateTime.Now).WithMessage("Start time must be in the future.");
+                .GreaterThan(r => r.StartTime).WithMessage("End time must be after the start time.");
         }
     }
 }
