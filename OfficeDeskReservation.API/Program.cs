@@ -10,8 +10,21 @@ using System.Text;
 using Microsoft.OpenApi.Models;
 using FluentValidation.AspNetCore;
 using FluentValidation;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var appInsightsConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"];
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.Console()
+    .WriteTo.ApplicationInsights(
+        connectionString: appInsightsConnectionString,
+        telemetryConverter: TelemetryConverter.Traces)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
@@ -19,6 +32,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(connectionString);
 });
+
+builder.Services.AddApplicationInsightsTelemetry();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
