@@ -1,6 +1,4 @@
 ﻿using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-using OfficeDeskReservation.API.Data;
 using OfficeDeskReservation.API.Dtos.Users;
 
 namespace OfficeDeskReservation.API.Validators

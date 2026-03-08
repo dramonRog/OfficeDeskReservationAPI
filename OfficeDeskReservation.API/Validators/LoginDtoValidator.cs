@@ -9,7 +9,7 @@ namespace OfficeDeskReservation.API.Validators
         {
             RuleFor(l => l.Email)
                 .NotEmpty().WithMessage("Email is required.")
-                .EmailAddress().WithMessage("Email is invalid.")
+                .Matches(@"^[^@\s]+@[^@\s]+\.[^@\s]+$").WithMessage("Email address is invalid.")
                 .MaximumLength(100).WithMessage("Email must not exceed 100 characters.");
 
             RuleFor(l => l.Password)
