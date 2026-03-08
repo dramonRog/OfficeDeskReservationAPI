@@ -8,11 +8,11 @@ namespace OfficeDeskReservation.API.Validators
         public DeskDtoValidator()
         {
             RuleFor(d => d.DeskIdentifier)
-                .NotEmpty().WithMessage("Desk identifier is required.")
-                .Length(1, 20).WithMessage("Desk identifier must be between 1 and 20 characters.");
+                .NotEmpty().WithMessage("Desk identifier is required!")
+                .Length(1, 20).WithMessage("Desk identifier must be between 1 and 20 characters!");
 
             RuleFor(d => d.RoomId)
-                .GreaterThan(0).WithMessage("A valid Room ID is required.");
+                .GreaterThan(0).WithMessage("A valid Room ID is required!");
         }
     }
 }

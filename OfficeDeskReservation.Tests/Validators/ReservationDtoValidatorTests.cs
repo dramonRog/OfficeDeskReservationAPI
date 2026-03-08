@@ -27,7 +27,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testReservationDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "Start time must be in the future.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "Start time must be in the future!");
         }
 
         [Fact]
@@ -42,7 +42,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testReservationDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "Start time is required.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "Start time is required!");
         }
 
         [Theory]
@@ -60,7 +60,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testReservationDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "A valid Desk ID is required.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "A valid Desk ID is required!");
         }
 
         [Fact]
@@ -75,7 +75,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testReservationDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "End time is required.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "End time is required!");
         }
 
         [Fact]
@@ -91,7 +91,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testReservationDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "End time must be after the start time.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "End time must be after the start time!");
         }
 
         [Fact]
@@ -109,7 +109,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testReservationDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "End time must be after the start time.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "End time must be after the start time!");
         }
     }
 }

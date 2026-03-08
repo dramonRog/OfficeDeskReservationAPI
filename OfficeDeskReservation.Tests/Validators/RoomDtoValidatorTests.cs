@@ -42,7 +42,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testRoomDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "Room name must have at least 3 characters and no more than 30");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "Room name must have at least 3 characters and no more than 30!");
         }
 
         [Theory]

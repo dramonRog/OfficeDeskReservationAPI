@@ -28,7 +28,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testRegisterDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "First name is required.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "First name is required!");
         }
 
         [Fact]
@@ -45,7 +45,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testRegisterDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "First name must contain at least 2 characters.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "First name must contain at least 2 characters!");
         }
 
         [Theory]
@@ -81,7 +81,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testRegisterDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "Last name is required.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "Last name is required!");
         }
 
         [Fact]
@@ -98,7 +98,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testRegisterDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "Last name must contain at least 2 characters");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "Last name must contain at least 2 characters!");
         }
 
         [Theory]
@@ -134,7 +134,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testRegisterDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "Email is required.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "Email address is required!");
         }
 
         [Theory]
@@ -154,7 +154,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testRegisterDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "Email address is invalid.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "Email address is invalid!");
         }
 
         [Fact]
@@ -188,7 +188,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testRegisterDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "Email must not exceed 100 characters.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "Email address must not exceed 100 characters!");
         }
 
         [Fact]
@@ -205,7 +205,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testRegisterDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "Password is required.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "Password is required!");
         }
 
         [Fact]
@@ -222,7 +222,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testRegisterDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "Password must contain at least 8 characters.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "Password must contain at least 8 characters!");
         }
 
         [Fact]
@@ -239,7 +239,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testRegisterDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "Password must contain at least one number.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "Password must contain at least one number!");
         }
 
         [Fact]
@@ -256,7 +256,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testRegisterDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "Password must contain at least one lowercase letter.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "Password must contain at least one lowercase letter!");
         }
 
         [Fact]
@@ -273,7 +273,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testRegisterDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "Password must contain at least one uppercase letter.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "Password must contain at least one uppercase letter!");
         }
 
         [Fact]
@@ -290,7 +290,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testRegisterDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "Password must contain at least one special character");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "Password must contain at least one special character!");
         }
     }
 }

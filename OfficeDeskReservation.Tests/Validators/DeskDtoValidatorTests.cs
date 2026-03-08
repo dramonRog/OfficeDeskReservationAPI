@@ -28,7 +28,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testDeskDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "A valid Room ID is required.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "A valid Room ID is required!");
         }
 
         [Fact]
@@ -58,7 +58,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testDeskDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "Desk identifier is required.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "Desk identifier is required!");
         }
 
         [Theory]
@@ -90,7 +90,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testDeskDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "Desk identifier must be between 1 and 20 characters.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "Desk identifier must be between 1 and 20 characters!");
         }
     }
 }

@@ -26,7 +26,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testLoginDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "Password is required.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "Password is required!");
         }
 
         [Fact]
@@ -41,7 +41,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testLoginDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "Email is required.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "Email address is required!");
         }
 
         [Theory]
@@ -61,7 +61,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testLoginDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "Email address is invalid.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "Email address is invalid!");
         }
 
         [Fact]
@@ -91,7 +91,7 @@ namespace OfficeDeskReservation.Tests.Validators
             ValidationResult result = _validator.Validate(testLoginDto);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "Email must not exceed 100 characters.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "Email address must not exceed 100 characters!");
         }
     }
 }
