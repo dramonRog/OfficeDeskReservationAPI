@@ -10,14 +10,16 @@ namespace OfficeDeskReservation.API.Validators
         public UserDtoValidator()
         {
             RuleFor(u => u.FirstName)
-                .NotEmpty().WithMessage("First name is required.");
+                .NotEmpty().WithMessage("First name is required.")
+                .MinimumLength(2).WithMessage("First name must contain at least 2 characters.");
 
             RuleFor(u => u.LastName)
-                .NotEmpty().WithMessage("Last name is required.");
+                .NotEmpty().WithMessage("Last name is required.")
+                .MinimumLength(2).WithMessage("Last name must contain at least 2 characters.");
 
             RuleFor(u => u.Email)
                 .NotEmpty().WithMessage("Email is required.")
-                .EmailAddress().WithMessage("Email address is invalid.")
+                .Matches(@"^[^@\s]+@[^@\s]+\.[^@\s]+$").WithMessage("Email address is invalid.")
                 .MaximumLength(100).WithMessage("Email must not exceed 100 characters.");
         }
     }
