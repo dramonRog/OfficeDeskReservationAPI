@@ -8,14 +8,16 @@ namespace OfficeDeskReservation.API.Validators
         public RegisterDtoValidator()
         {
             RuleFor(r => r.FirstName)
-                .NotEmpty().WithMessage("First name is required.");
+                .NotEmpty().WithMessage("First name is required.")
+                .MinimumLength(2).WithMessage("First name must contain at least 2 characters.");
 
             RuleFor(r => r.LastName)
-                .NotEmpty().WithMessage("Last name is required.");
+                .NotEmpty().WithMessage("Last name is required.")
+                .MinimumLength(2).WithMessage("Last name must contain at least 2 characters");
 
             RuleFor(r => r.Email)
                 .NotEmpty().WithMessage("Email is required.")
-                .EmailAddress().WithMessage("Email is invalid.")
+                .Matches(@"^[^@\s]+@[^@\s]+\.[^@\s]+$").WithMessage("Email address is invalid.")
                 .MaximumLength(100).WithMessage("Email must not exceed 100 characters.");
 
             RuleFor(r => r.Password)
