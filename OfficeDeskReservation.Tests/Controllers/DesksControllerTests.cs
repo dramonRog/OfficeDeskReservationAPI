@@ -76,7 +76,7 @@ namespace OfficeDeskReservation.Tests.Controllers
         {
             _mockDeskService
                 .Setup(service => service.GetDeskByIdAsync(1))
-                .ReturnsAsync((DeskResponseDto)null);
+                .ReturnsAsync((DeskResponseDto?)null);
 
             ActionResult<DeskResponseDto> result = await _controller.GetDeskByIdAsync(1);
             NotFoundResult okResult = result.Result.Should().BeOfType<NotFoundResult>().Subject;
