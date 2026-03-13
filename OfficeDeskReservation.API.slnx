@@ -1,4 +1,8 @@
 <Solution>
   <Project Path="OfficeDeskReservation.API/OfficeDeskReservation.API.csproj" />
   <Project Path="OfficeDeskReservation.Tests/OfficeDeskReservation.Tests.csproj" Id="f6be1b13-1f52-4b2c-95cd-0c17520c7236" />
+  <Project Path="OfficeDeskReservation.UI/OfficeDeskReservation.UI.esproj">
+    <Build />
+    <Deploy />
+  </Project>
 </Solution>
