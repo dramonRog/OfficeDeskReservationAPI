@@ -8,22 +8,22 @@
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-  .login-container h2 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 25px;
-  }
+.login-container h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 25px;
+}
 
 .form-group {
   margin-bottom: 20px;
 }
 
-  .form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: #555;
-  }
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #555;
+}
 
 .form-control {
   width: 100%;
@@ -34,10 +34,10 @@
   transition: border-color 0.3s;
 }
 
-  .form-control:focus {
-    border-color: #0066cc;
-    outline: none;
-  }
+.form-control:focus {
+  border-color: #0066cc;
+  outline: none;
+}
 
 .btn-primary {
   width: 100%;
@@ -52,9 +52,9 @@
   transition: background-color 0.3s;
 }
 
-  .btn-primary:hover {
-    background-color: #0052a3;
-  }
+.btn-primary:hover {
+  background-color: #0052a3;
+}
 
 .alert-message {
   margin-top: 20px;
@@ -64,12 +64,12 @@
   font-weight: bold;
 }
 
-  .alert-message.success {
-    background-color: #d4edda;
-    color: #155724;
-  }
+.alert-message.success {
+  background-color: #d4edda;
+  color: #155724;
+}
 
-  .alert-message.error {
-    background-color: #f8d7da;
-    color: #721c24;
-  }
+.alert-message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+}

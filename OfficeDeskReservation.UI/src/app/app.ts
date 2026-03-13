@@ -29,12 +29,7 @@ export class App {
         this.cdr.detectChanges();
       },
       error: (err: any) => {
-        if (err.status === 400) {
-          this.message = 'Error: Incorrect data!';
-        } else {
-          this.message = 'Error: ' + err.status;
-        }
-
+        this.message = 'Invalid email or password!';
         this.cdr.detectChanges();
       }
     });

@@ -1,6 +1,12 @@
 <div class="login-container">
   <h2>Login into system</h2>
 
+  @if (message) {
+  <div class="alert-message" [class.success]="message === 'Success!'" [class.error]="message !== 'Success!'">
+    {{ message }}
+  </div>
+  }
+
   <div class="form-group">
     <label>Email:</label>
     <input type="text" [(ngModel)]="email" class="form-control" placeholder="admin@example.com">
@@ -12,10 +18,4 @@
   </div>
 
   <button (click)="login()" class="btn-primary">Login</button>
-
-  @if (message) {
-  <div class="alert-message" [class.success]="message === 'Success!'" [class.error]="message !== 'Success!'">
-    {{ message }}
-  </div>
-  }
 </div>
