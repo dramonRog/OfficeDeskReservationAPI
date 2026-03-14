@@ -1,5 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -9,52 +8,53 @@ import { Router } from '@angular/router';
   standalone: false
 })
 export class HomeComponent implements OnInit {
-  public rooms: any[] = [];
-  public errorMessage: string = '';
-  public isLoading: boolean = true;
+  public userName: string = '';
+  public userRole: string = '';
+  public userEmail: string = '';
+  public userInitials: string = '';
+  public isProfileOpen: boolean = false;
 
-  public selectedDate: string = new Date().toISOString().split('T')[0];
+  public navLinks = [
+    { label: 'Dashboard', active: true },
+    { label: 'My Bookings', active: false },
+    { label: 'Floor Plans', active: false },
+    { label: 'Reports', active: false }
+  ];
 
-  constructor(private http: HttpClient, private router: Router, private cdr: ChangeDetectorRef) { }
+  constructor(private router: Router) { }
 
   ngOnInit(): void {
-    this.loadRooms();
-  }
-
-  public loadRooms(): void {
-    this.isLoading = true;
-    this.errorMessage = '';
-
     const token = localStorage.getItem('token');
     if (!token) {
       this.logout();
       return;
     }
-
-    const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
-
-    this.http.get('https://localhost:7115/api/Rooms', { headers }).subscribe({
-      next: (response: any) => {
-        this.rooms = response.items || response;
-        this.isLoading = false;
-
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        this.errorMessage = 'Failed to load rooms. ' + err.status;
-        this.isLoading = false;
-        if (err.status === 401) {
-          this.logout();
-        }
-      }
-    });
+    this.decodeToken(token);
   }
 
-  public viewRoom(roomId: number): void {
-    console.log(`Navigating to room ${roomId} on date ${this.selectedDate}`);
+  private decodeToken(token: string): void {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+
+    const fullName = payload['unique_name'];
+    this.userName = fullName;
+
+    this.userRole = payload['role'];
+
+    this.userEmail = payload['email'];
+
+    const parts = this.userName.trim().split(' ');
+    if (parts.length > 1 && parts[0] && parts[parts.length - 1]) {
+      this.userInitials = (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    } else {
+      this.userInitials = this.userName.substring(0, 2).toUpperCase();
+    }
   }
 
-  public logout(): void {
+  public toggleProfileMenu() {
+    this.isProfileOpen = !this.isProfileOpen;
+  }
+
+  public logout() {
     localStorage.removeItem('token');
     this.router.navigate(['/login']);
   }

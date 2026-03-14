@@ -1,6 +1,5 @@
-html, body {
+body {
+  background-color: #dcdcdc;
   margin: 0;
-  padding: 0;
-  background-color: #f8f9fa;
-  height: 100%;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
