@@ -35,7 +35,8 @@ namespace OfficeDeskReservation.Tests.Controllers
             UserResponseDto expectedResponse = new UserResponseDto
             {
                 Id = 1,
-                Name = "John Doe",
+                FirstName = "John",
+                LastName = "Doe",
                 Email = "praca@gmail.com",
                 Role = Role.User
             };

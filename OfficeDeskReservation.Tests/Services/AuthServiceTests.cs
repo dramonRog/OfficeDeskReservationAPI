@@ -91,7 +91,8 @@ namespace OfficeDeskReservation.Tests.Services
 
             result.Should().NotBeNull();
             result.Email.Should().Be("praca@gmail.com");
-            result.Name.Should().Be("Jan Dobrovolsky");
+            result.FirstName.Should().Be("Jan");
+            result.LastName.Should().Be("Dobrovolsky");
 
             User? createdUser = await context.Users.FirstOrDefaultAsync(u => u.Email == "praca@gmail.com");
 

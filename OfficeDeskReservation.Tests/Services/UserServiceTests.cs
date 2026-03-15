@@ -83,7 +83,8 @@ namespace OfficeDeskReservation.Tests.Services
 
             result.Should().NotBeNull();
             result.TotalCount.Should().Be(1);
-            result.Items.First().Name.Should().Be("Anna Smith");
+            result.Items.First().FirstName.Should().Be("Anna");
+            result.Items.First().LastName.Should().Be("Smith");
         }
 
         [Fact]

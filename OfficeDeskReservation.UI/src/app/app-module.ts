@@ -1,13 +1,14 @@
 import { NgModule, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
 import { HomeComponent } from './components/home/home';
 import { LoginComponent } from './components/login/login';
 import { RegisterComponent } from './components/register/register';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
 ;
 @NgModule({
   declarations: [
@@ -24,6 +25,11 @@ import { RegisterComponent } from './components/register/register';
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
   ],
   bootstrap: [App]
 })

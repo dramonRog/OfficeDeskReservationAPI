@@ -1,10 +1,12 @@
 ﻿using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using OfficeDeskReservation.API.Controllers;
 using OfficeDeskReservation.API.Dtos.Users;
 using OfficeDeskReservation.API.Pagination;
 using OfficeDeskReservation.API.Services.Interfaces;
+using System.Security.Claims;
 
 namespace OfficeDeskReservation.Tests.Controllers
 {
@@ -35,9 +37,9 @@ namespace OfficeDeskReservation.Tests.Controllers
                 TotalCount = 3,
                 Items = new List<UserResponseDto>
                 {
-                    new UserResponseDto { Id = 1, Name = "John Doe", Email = "praca1@gmail.com" },
-                    new UserResponseDto { Id = 2, Name = "Jan Kovalski", Email = "praca2@gmail.com" },
-                    new UserResponseDto { Id = 3, Name = "Ja Dobrovolski", Email = "praca3@gmail.com" }
+                    new UserResponseDto { Id = 1, FirstName = "John", LastName = "Doe", Email = "praca1@gmail.com" },
+                    new UserResponseDto { Id = 2, FirstName = "Jan", LastName = "Kovalski", Email = "praca2@gmail.com" },
+                    new UserResponseDto { Id = 3, FirstName = "Ja", LastName = "Dobrovolski", Email = "praca3@gmail.com" }
                 }
             };
 
@@ -57,7 +59,8 @@ namespace OfficeDeskReservation.Tests.Controllers
             UserResponseDto expectedResult = new UserResponseDto
             {
                 Id = 1,
-                Name = "John Doe",
+                FirstName = "John",
+                LastName = "Doe",
                 Email = "praca@gmail.com"
             };
 
@@ -86,6 +89,8 @@ namespace OfficeDeskReservation.Tests.Controllers
         [Fact]
         public async Task PutUserAsync_WhenDataValid_ShouldReturnNoContent()
         {
+            SetupUserContext(1);
+
             UserDto inputUserDto = new UserDto
             {
                 FirstName = "John",
@@ -105,6 +110,8 @@ namespace OfficeDeskReservation.Tests.Controllers
         [Fact]
         public async Task PutUserAsync_WhenUserDoesNotExist_ShouldReturnNotFound()
         {
+            SetupUserContext(1);
+
             UserDto inputUserDto = new UserDto
             {
                 FirstName = "John",
@@ -143,6 +150,18 @@ namespace OfficeDeskReservation.Tests.Controllers
             IActionResult result = await _controller.RemoveUserByIdAsync(1);
             result.Should().BeOfType<NoContentResult>();
             _mockUserService.Verify(service => service.DeleteUserAsync(1), Times.Once);
+        }
+
+        private void SetupUserContext(int userId)
+        {
+            var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, userId.ToString()) };
+            var identity = new ClaimsIdentity(claims, "TestAuth");
+            var user = new ClaimsPrincipal(identity);
+
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = user }
+            };
         }
     }
 }
