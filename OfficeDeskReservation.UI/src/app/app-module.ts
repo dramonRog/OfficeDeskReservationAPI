@@ -23,7 +23,7 @@ import { UserManagementComponent } from './components/user-management/user-manag
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),
