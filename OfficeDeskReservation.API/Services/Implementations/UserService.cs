@@ -97,5 +97,17 @@ namespace OfficeDeskReservation.API.Services.Implementations
 
             return true;
         }
+
+        public async Task<bool> ChangeRoleAsync(int id, ChangeRoleDto request)
+        {
+            User? user = await _context.Users.FindAsync(id);
+            if (user == null)
+                return false;
+
+            user.Role = request.Role;
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

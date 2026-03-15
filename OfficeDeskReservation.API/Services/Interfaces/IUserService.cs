@@ -9,5 +9,6 @@ namespace OfficeDeskReservation.API.Services.Interfaces
         Task<UserResponseDto?> GetUserByIdAsync(int id);
         Task<bool> UpdateUserAsync(int id, UserDto userDto);
         Task<bool> DeleteUserAsync(int id);
+        Task<bool> ChangeRoleAsync(int id, ChangeRoleDto reqest);
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using OfficeDeskReservation.API.Dtos.Users;
 using OfficeDeskReservation.API.Pagination;
 using OfficeDeskReservation.API.Services.Interfaces;
+using System.Security.Claims;
 
 namespace OfficeDeskReservation.API.Controllers
 {
@@ -38,11 +39,29 @@ namespace OfficeDeskReservation.API.Controllers
         }
 
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUserAsync(int id, [FromBody] UserDto user)
         {
+            string? currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!int.TryParse(currentUserId, out int currentId))
+                return Unauthorized();
+
+            if (id != currentId && !User.IsInRole("Admin"))
+                return Forbid();
+
             if (await _service.UpdateUserAsync(id, user))
+                return NoContent();
+            return NotFound();
+        }
+
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{id}/role")]
+        public async Task<IActionResult> ChangeRoleAsync(int id, [FromBody] ChangeRoleDto request)
+        {
+            if (await _service.ChangeRoleAsync(id, request))
                 return NoContent();
             return NotFound();
         }
