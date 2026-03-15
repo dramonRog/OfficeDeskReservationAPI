@@ -1,21 +1,52 @@
-<div class="login-container">
-  <h2>Login into system</h2>
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <rect x="2" y="7" width="20" height="14" rx="2" />
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+        </svg>
+      </div>
+      <h1>Login into system</h1>
+      <p>Enter your details to access your account</p>
+    </div>
 
-  @if (message) {
-  <div class="alert-message" [class.success]="message === 'Success!'" [class.error]="message !== 'Success!'">
-    {{ message }}
+    @if (errorMessage) {
+    <div class="alert error-alert animate-in">
+      <i class="bi bi-exclamation-circle-fill"></i>
+      <span>{{ errorMessage }}</span>
+    </div>
+    }
+
+    @if (successMessage) {
+    <div class="alert success-alert animate-in">
+      <i class="bi bi-check-circle-fill"></i>
+      <span>{{ successMessage }}</span>
+    </div>
+    }
+
+    <form (ngSubmit)="onLogin()">
+      <div class="form-group" [class.has-error]="hasError">
+        <label>Email Address</label>
+        <div class="input-wrapper">
+          <i class="bi bi-envelope"></i>
+          <input type="email" name="email" [(ngModel)]="loginObj.email" placeholder="admin@example.com" required>
+        </div>
+      </div>
+
+      <div class="form-group" [class.has-error]="hasError">
+        <label>Password</label>
+        <div class="input-wrapper">
+          <i class="bi bi-lock"></i>
+          <input type="password" name="password" [(ngModel)]="loginObj.password" placeholder="••••••••" required>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn">Login</button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Don't have an account? <a routerLink="/register">Create one for free</a></p>
+    </div>
   </div>
-  }
-
-  <div class="form-group">
-    <label>Email:</label>
-    <input type="text" [(ngModel)]="email" class="form-control" placeholder="admin@example.com">
-  </div>
-
-  <div class="form-group">
-    <label>Password:</label>
-    <input type="password" [(ngModel)]="password" class="form-control" placeholder="••••••••">
-  </div>
-
-  <button (click)="login()" class="btn-primary">Login</button>
 </div>

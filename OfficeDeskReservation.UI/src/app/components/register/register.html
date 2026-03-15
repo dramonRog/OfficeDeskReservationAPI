@@ -1,0 +1,76 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <rect x="2" y="7" width="20" height="14" rx="2" />
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+        </svg>
+      </div>
+      <h1>Create Account</h1>
+      <p>Join DeskHub to start booking your space</p>
+    </div>
+
+    @if (errorMessage) {
+    <div class="alert error-alert animate-in">
+      <i class="bi bi-exclamation-circle-fill"></i>
+      <span>{{ errorMessage }}</span>
+    </div>
+    }
+
+    @if (isSuccess) {
+    <div class="alert success-alert animate-in">
+      <i class="bi bi-check-circle-fill"></i>
+      <span>{{ message }}</span>
+    </div>
+    }
+
+    <form (ngSubmit)="onRegister()">
+      <div class="form-group" [class.has-error]="errorField === 'FirstName'">
+        <label>First Name</label>
+        <div class="input-wrapper">
+          <i class="bi bi-person"></i>
+          <input type="text" name="firstName" [(ngModel)]="regObj.firstName" placeholder="Enter your first name" required>
+        </div>
+      </div>
+
+      <div class="form-group" [class.has-error]="errorField === 'LastName'">
+        <label>Last Name</label>
+        <div class="input-wrapper">
+          <i class="bi bi-person"></i>
+          <input type="text" name="lastName" [(ngModel)]="regObj.lastName" placeholder="Enter your last name" required>
+        </div>
+      </div>
+
+      <div class="form-group" [class.has-error]="errorField === 'Email'">
+        <label>Email Address</label>
+        <div class="input-wrapper">
+          <i class="bi bi-envelope"></i>
+          <input type="email" name="email" [(ngModel)]="regObj.email" placeholder="Enter your email address" required>
+        </div>
+      </div>
+
+      <div class="form-group" [class.has-error]="errorField === 'Password'">
+        <label>Password</label>
+        <div class="input-wrapper">
+          <i class="bi bi-lock"></i>
+          <input type="password" name="password" [(ngModel)]="regObj.password" placeholder="Create a password" required>
+        </div>
+      </div>
+
+      <div class="form-group" [class.has-error]="errorField === 'ConfirmPassword'">
+        <label>Confirm Password</label>
+        <div class="input-wrapper">
+          <i class="bi bi-shield-lock"></i>
+          <input type="password" name="confirmPassword" [(ngModel)]="regObj.confirmPassword" placeholder="Repeat your password" required>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn">Create Account</button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Already have an account? <a routerLink="/login">Log in here</a></p>
+    </div>
+  </div>
+</div>

@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, signal } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -9,29 +9,47 @@ import { Router } from '@angular/router';
   standalone: false
 })
 export class LoginComponent {
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private router: Router) { }
+  constructor(
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef,
+    private router: Router
+  ) { }
 
-  public password: string = '';
-  public email: string = '';
-  public message: string = '';
+  public loginObj = {
+    email: '',
+    password: ''
+  };
 
-  public login(): void {
+  public errorMessage: string = '';
+  public successMessage: string = '';
+  public hasError: boolean = false; 
+
+  public onLogin(): void {
     const url: string = 'https://localhost:7115/api/Auth/login';
-    const body: { email: string, password: string } = {
-      email: this.email,
-      password: this.password
-    };
 
-    this.http.post(url, body).subscribe({
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.hasError = false;
+
+    this.http.post(url, this.loginObj).subscribe({
       next: (response: any) => {
-        this.message = 'Success!';
+        this.successMessage = 'Success! Logging you in...';
         localStorage.setItem('token', response.token);
 
         this.router.navigate(['/']);
         this.cdr.detectChanges();
       },
       error: (err: any) => {
-        this.message = 'Invalid email or password!';
+        this.hasError = true;
+
+        if (err.error && err.error.message) {
+          this.errorMessage = err.error.message;
+        } else if (err.error && typeof err.error === 'string') {
+          this.errorMessage = err.error;
+        } else {
+          this.errorMessage = 'Invalid email or password!';
+        }
+
         this.cdr.detectChanges();
       }
     });
