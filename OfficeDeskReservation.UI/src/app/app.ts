@@ -19,7 +19,8 @@ export class App implements OnInit {
     { label: 'My Bookings', path: '/bookings', active: false, roles: ['Admin', 'Manager', 'User'] },
     { label: 'Floor Plans', path: '/floor-plans', active: false, roles: ['Admin', 'Manager', 'User'] },
     { label: 'Reports', path: '/reports', active: false, roles: ['Admin', 'Manager', 'User'] },
-    { label: 'Desks', path: '/desks', active: false, roles: ['Admin', 'Manager'] }
+    { label: 'Desks', path: '/desks', active: false, roles: ['Admin', 'Manager'] },
+    { label: 'Rooms', path: '/rooms', active: false, roles: ['Admin', 'Manager'] }
   ];
 
   public get visibleNavLinks() {

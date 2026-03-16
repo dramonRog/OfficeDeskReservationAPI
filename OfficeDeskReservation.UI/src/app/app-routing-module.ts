@@ -7,6 +7,7 @@ import { RegisterComponent } from './components/register/register';
 import { UserManagementComponent } from './components/user-management/user-management';
 import { DeskManagementComponent } from './components/desk-management/desk-management';
 import { roleGuard } from './guards/role.guard';
+import { RoomManagementComponent } from './components/room-management/room-management';
 
 const routes: Routes = [
   { path: '', component: HomeComponent, canActivate: [authGuard] },
@@ -22,6 +23,13 @@ const routes: Routes = [
   {
     path: 'desks',
     component: DeskManagementComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['Admin', 'Manager'] }
+  },
+
+  {
+    path: 'rooms',
+    component: RoomManagementComponent,
     canActivate: [authGuard, roleGuard],
     data: { roles: ['Admin', 'Manager'] }
   }

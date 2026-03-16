@@ -11,6 +11,7 @@ import { RegisterComponent } from './components/register/register';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { UserManagementComponent } from './components/user-management/user-management';
 import { DeskManagementComponent } from './components/desk-management/desk-management';
+import { RoomManagementComponent } from './components/room-management/room-management';
 ;
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { DeskManagementComponent } from './components/desk-management/desk-manag
     LoginComponent,
     RegisterComponent,
     UserManagementComponent,
-    DeskManagementComponent
+    DeskManagementComponent,
+    RoomManagementComponent
   ],
   imports: [
     BrowserModule,
