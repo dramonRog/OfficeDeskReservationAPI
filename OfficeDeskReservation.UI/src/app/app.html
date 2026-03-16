@@ -59,12 +59,6 @@
           <button class="dropdown-item"><i class="bi bi-person"></i> My Profile</button>
           <button class="dropdown-item"><i class="bi bi-gear"></i> Account Settings</button>
 
-          @if (userRole === 'Admin' || userRole === 'Manager') {
-          <button class="dropdown-item admin-link" routerLink="/users">
-            <i class="bi bi-people"></i> Manage Users
-          </button>
-          }
-
           <button class="dropdown-item"><i class="bi bi-question-circle"></i> Help & Support</button>
 
           <div class="dropdown-line"></div>
