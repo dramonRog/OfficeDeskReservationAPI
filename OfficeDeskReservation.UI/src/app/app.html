@@ -16,7 +16,10 @@
 
     <nav class="center-nav">
       @for (link of visibleNavLinks; track link.label) {
-      <button class="nav-button" [class.active]="link.active" [routerLink]="link.path">
+      <button class="nav-button"
+              [routerLink]="link.path"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{exact: link.path === '/'}">
         {{ link.label }}
       </button>
       }

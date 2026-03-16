@@ -15,10 +15,7 @@ export class App implements OnInit {
   public isProfileOpen: boolean = false;
 
   public navLinks = [
-    { label: 'Dashboard', path: '/', active: true, roles: ['Admin', 'Manager', 'User'] },
     { label: 'My Bookings', path: '/bookings', active: false, roles: ['Admin', 'Manager', 'User'] },
-    { label: 'Floor Plans', path: '/floor-plans', active: false, roles: ['Admin', 'Manager', 'User'] },
-    { label: 'Reports', path: '/reports', active: false, roles: ['Admin', 'Manager', 'User'] },
     { label: 'Desks', path: '/desks', active: false, roles: ['Admin', 'Manager'] },
     { label: 'Rooms', path: '/rooms', active: false, roles: ['Admin', 'Manager'] }
   ];
