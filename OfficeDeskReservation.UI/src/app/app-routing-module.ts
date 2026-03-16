@@ -5,12 +5,26 @@ import { authGuard } from './guards/auth.guard';
 import { LoginComponent } from './components/login/login';
 import { RegisterComponent } from './components/register/register';
 import { UserManagementComponent } from './components/user-management/user-management';
+import { DeskManagementComponent } from './components/desk-management/desk-management';
+import { roleGuard } from './guards/role.guard';
 
 const routes: Routes = [
   { path: '', component: HomeComponent, canActivate: [authGuard] },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'users', component: UserManagementComponent, canActivate: [authGuard] }
+  {
+    path: 'users',
+    component: UserManagementComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['Admin']}
+  },
+
+  {
+    path: 'desks',
+    component: DeskManagementComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['Admin', 'Manager'] }
+  }
 ];
 
 @NgModule({

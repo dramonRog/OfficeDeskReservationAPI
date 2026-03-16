@@ -10,6 +10,7 @@ import { LoginComponent } from './components/login/login';
 import { RegisterComponent } from './components/register/register';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { UserManagementComponent } from './components/user-management/user-management';
+import { DeskManagementComponent } from './components/desk-management/desk-management';
 ;
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { UserManagementComponent } from './components/user-management/user-manag
     HomeComponent,
     LoginComponent,
     RegisterComponent,
-    UserManagementComponent
+    UserManagementComponent,
+    DeskManagementComponent
   ],
   imports: [
     BrowserModule,

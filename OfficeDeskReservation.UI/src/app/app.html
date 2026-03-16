@@ -15,7 +15,7 @@
     </div>
 
     <nav class="center-nav">
-      @for (link of navLinks; track link.label) {
+      @for (link of visibleNavLinks; track link.label) {
       <button class="nav-button" [class.active]="link.active" [routerLink]="link.path">
         {{ link.label }}
       </button>
