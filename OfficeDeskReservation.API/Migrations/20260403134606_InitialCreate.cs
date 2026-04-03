@@ -103,7 +103,7 @@ namespace OfficeDeskReservation.API.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "Email", "FirstName", "LastName", "PasswordHash", "Role" },
-                values: new object[] { 1, "roman.buchynskyi2006@gmail.com", "Roman", "Buchynskyi", "$2a$11$hJdOFEZjgEkvTuUQBdwdt.2UCFadrvZZn.2boL/wsudOurwjy7x9C", 2 });
+                values: new object[] { 1, "roman.buchynskyi2006@gmail.com", "Roman", "Buchynskyi", "$2a$11$KYxIeRootPrk.RLtbBRBle5TRHsZG9l4zJ5Q2krvF16REoqjvGQHS", 2 });
 
             migrationBuilder.InsertData(
                 table: "Desks",

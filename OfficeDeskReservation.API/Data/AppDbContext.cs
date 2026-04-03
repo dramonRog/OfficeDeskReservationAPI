@@ -56,7 +56,7 @@ namespace OfficeDeskReservation.API.Data
                     FirstName = "Roman",
                     LastName = "Buchynskyi",
                     Email = "roman.buchynskyi2006@gmail.com",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
+                    PasswordHash = "$2a$11$KYxIeRootPrk.RLtbBRBle5TRHsZG9l4zJ5Q2krvF16REoqjvGQHS", // Admin123!
                     Role = Role.Admin
                 }
             );
