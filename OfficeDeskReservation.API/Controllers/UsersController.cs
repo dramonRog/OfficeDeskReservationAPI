@@ -71,6 +71,21 @@ namespace OfficeDeskReservation.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> RemoveUserByIdAsync(int id)
         {
+            string? currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!int.TryParse(currentUserId, out int currentId))
+                return Unauthorized();
+
+            if (currentId == id)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Status = StatusCodes.Status400BadRequest,
+                    Title = "Action Not Allowed",
+                    Detail = "You cannot delete your own account"
+                });
+            }
+
             if (await _service.DeleteUserAsync(id))
                 return NoContent();
             return NotFound();
