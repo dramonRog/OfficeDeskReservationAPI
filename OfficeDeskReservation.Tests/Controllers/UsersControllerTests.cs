@@ -131,6 +131,8 @@ namespace OfficeDeskReservation.Tests.Controllers
         [Fact]
         public async Task RemoveUserByIdAsync_WhenUserDoesNotExist_ShouldReturnNotFound()
         {
+            SetupUserContext(99);
+
             _mockUserService
                 .Setup(service => service.DeleteUserAsync(1))
                 .ReturnsAsync(false);
@@ -143,6 +145,8 @@ namespace OfficeDeskReservation.Tests.Controllers
         [Fact]
         public async Task RemoveUserByIdAsync_WhenUserExists_ShouldReturnNoContent()
         {
+            SetupUserContext(99);
+
             _mockUserService
                 .Setup(service => service.DeleteUserAsync(1))
                 .ReturnsAsync(true);
