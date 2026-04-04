@@ -13,6 +13,7 @@ export class UserManagementComponent implements OnInit {
   public currentPage: number = 1;
   public totalPages: number = 1;
   public searchTerm: string = '';
+  public currentUserId: number = 0;
 
   public isEditModalOpen: boolean = false;
   public isSaving: boolean = false;
@@ -25,6 +26,19 @@ export class UserManagementComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUsers();
+
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+
+        const rawId = payload['nameid'];
+
+        this.currentUserId = Number(rawId);
+      } catch (e) {
+        console.error('Failed to parse token payload', e);
+      }
+    }
   }
 
   public loadUsers(): void {

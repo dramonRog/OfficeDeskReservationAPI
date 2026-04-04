@@ -56,9 +56,12 @@
               <button class="btn-icon edit" (click)="onEdit(user)" title="Edit User">
                 <i class="bi bi-pencil-square"></i>
               </button>
+
+              @if (user.id !== currentUserId) {
               <button class="btn-icon delete" (click)="openDeleteModal(user)" title="Delete User">
                 <i class="bi bi-trash3"></i>
               </button>
+              }
             </td>
           </tr>
           }
