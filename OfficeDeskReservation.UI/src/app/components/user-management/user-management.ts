@@ -22,6 +22,8 @@ export class UserManagementComponent implements OnInit {
   public isDeleteModalOpen: boolean = false;
   public userToDelete: any = null;
 
+  public errorMessage: string | null = null;
+
   constructor(private userService: UserService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
@@ -81,17 +83,20 @@ export class UserManagementComponent implements OnInit {
     else if (this.editObj.role === 'Manager') this.editObj.role = 1;
     else if (this.editObj.role === 'User') this.editObj.role = 0;
 
+    this.errorMessage = null;
     this.isEditModalOpen = true;
     this.cdr.detectChanges();
   }
 
   public closeEditModal(): void {
     this.isEditModalOpen = false;
+    this.errorMessage = null;
     this.cdr.detectChanges();
   }
 
   public onSaveUser(): void {
     this.isSaving = true;
+    this.errorMessage = null;
     this.cdr.detectChanges();
 
     const profileData = {
@@ -110,15 +115,21 @@ export class UserManagementComponent implements OnInit {
           },
           error: (roleErr) => {
             this.isSaving = false;
-            alert("Data updated, but failed to change role.");
+            this.errorMessage = roleErr.error?.detail || "Data updated, but failed to change role.";
             this.cdr.detectChanges();
           }
         });
       },
       error: (profileErr) => {
         this.isSaving = false;
-        const msg = profileErr.error?.detail || "Failed to update profile data.";
-        alert(`Error: ${msg}`);
+
+        if (profileErr.error?.errors) {
+          const validationMessages = Object.values(profileErr.error.errors).flat();
+          this.errorMessage = validationMessages.join(' ');
+        } else {
+          this.errorMessage = profileErr.error?.detail || "Failed to update profile data.";
+        }
+
         this.cdr.detectChanges();
       }
     });
