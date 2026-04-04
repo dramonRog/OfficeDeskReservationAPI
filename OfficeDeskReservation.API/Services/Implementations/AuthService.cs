@@ -30,6 +30,9 @@ namespace OfficeDeskReservation.API.Services.Implementations
             if (await _context.Users.AnyAsync(u => u.Email == request.Email))
                 throw new InvalidOperationException("User with this email already exists.");
 
+            if (await _context.Users.AnyAsync(u => u.FirstName == request.FirstName && u.LastName == request.LastName))
+                throw new InvalidOperationException("The user with such name and surname already exists.");
+
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
             User user = new User

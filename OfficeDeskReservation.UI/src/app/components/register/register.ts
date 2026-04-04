@@ -90,7 +90,12 @@ export class RegisterComponent {
 
     } else if (err.error && err.error.detail) {
       this.errorMessage = err.error.detail;
-      this.errorField = 'Email';
+
+      if (this.errorMessage.includes("name and surname")) {
+        this.errorField = 'FullName';
+      } else {
+        this.errorField = 'Email';
+      }
     } else if (err.error && err.error.message) {
       this.errorMessage = err.error.message;
       this.errorField = 'Email';
