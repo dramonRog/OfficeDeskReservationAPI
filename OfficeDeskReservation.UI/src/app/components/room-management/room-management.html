@@ -92,12 +92,12 @@
       }
 
       <div class="form-group">
-        <label>Room Name (e.g. Conference Room A)</label>
+        <label>Room Name</label>
         <input type="text"
                class="modern-input"
-               [class.input-error]="formErrorMessage && !roomForm.name.trim()"
+               [class.input-error]="hasNameError"
                [(ngModel)]="roomForm.name"
-               placeholder="Enter room name">
+               placeholder="e.g., Conference Room A">
       </div>
     </div>
 

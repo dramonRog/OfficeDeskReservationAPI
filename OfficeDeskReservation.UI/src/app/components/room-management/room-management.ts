@@ -35,6 +35,11 @@ export class RoomManagementComponent implements OnInit {
     this.loadRooms();
   }
 
+  public get hasNameError(): boolean {
+    return this.formErrorMessage.includes('already exists') ||
+      this.formErrorMessage.includes('Room name');
+  }
+
   showNotification(message: string, isError: boolean = false): void {
     this.notification = { show: true, message, isError };
     this.cdr.detectChanges();
@@ -106,17 +111,27 @@ export class RoomManagementComponent implements OnInit {
       return;
     }
 
-    const isDuplicate = this.rooms.some(r =>
-      r.name.toLowerCase() === roomName.toLowerCase() &&
-      r.id !== this.currentRoomId
-    );
+    this.roomService.getRooms(1, 1000, roomName).subscribe({
+      next: (res: any) => {
+        const items = res.items || res.Items || [];
+        const duplicate = items.find((r: any) =>
+          (r.name || r.Name).toLowerCase() === roomName.toLowerCase() &&
+          (r.id !== this.currentRoomId)
+        );
 
-    if (isDuplicate) {
-      this.formErrorMessage = "A room with this name already exists.";
-      return;
-    }
-
-    this.isConfirmSaveModalOpen = true;
+        if (duplicate) {
+          this.formErrorMessage = "A room with this name already exists.";
+          this.cdr.detectChanges();
+        } else {
+          this.isConfirmSaveModalOpen = true;
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {
+        this.formErrorMessage = "Could not verify room name uniqueness. Try again.";
+        this.cdr.detectChanges();
+      }
+    })
   }
 
   closeConfirmSaveModal(): void {
@@ -127,6 +142,10 @@ export class RoomManagementComponent implements OnInit {
     if (err.error && err.error.errors) {
       const firstKey = Object.keys(err.error.errors)[0];
       return err.error.errors[firstKey][0];
+    }
+
+    if (err.error && err.error.detail) {
+      return err.error.detail;
     }
 
     if (err.error && err.error.message) {
