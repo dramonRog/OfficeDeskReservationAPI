@@ -8,11 +8,13 @@ import { UserManagementComponent } from './components/user-management/user-manag
 import { DeskManagementComponent } from './components/desk-management/desk-management';
 import { roleGuard } from './guards/role.guard';
 import { RoomManagementComponent } from './components/room-management/room-management';
+import { ReservationsComponent } from './components/reservation-management/reservations-management'
 
 const routes: Routes = [
   { path: '', component: HomeComponent, canActivate: [authGuard] },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+  { path: 'reservations', component: ReservationsComponent, canActivate: [authGuard] },
   {
     path: 'users',
     component: UserManagementComponent,

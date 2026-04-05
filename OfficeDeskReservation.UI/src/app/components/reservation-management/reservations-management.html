@@ -1,0 +1,127 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1>Reservations</h1>
+    <button class="btn-primary" (click)="openAddModal()">
+      <i class="bi bi-calendar-plus"></i> New Reservation
+    </button>
+  </div>
+
+  <h2 class="section-title">My Reservations</h2>
+  <div class="card table-card mb-4">
+    <table class="modern-table">
+      <thead>
+        <tr>
+          <th>Room & Desk Name</th>
+          <th>Start Time</th>
+          <th>End Time</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (res of myReservations; track res.id) {
+        <tr>
+          <td class="fw-bold">{{ res.roomName }} - {{ res.deskName }}</td>
+          <td>{{ res.startTime | date:'short' }}</td>
+          <td>{{ res.endTime | date:'short' }}</td>
+          <td class="actions-cell">
+            <button class="btn-icon delete" (click)="deleteReservation(res.id)" title="Cancel">
+              <i class="bi bi-trash3"></i>
+            </button>
+          </td>
+        </tr>
+        } @empty {
+        <tr><td colspan="4" class="empty-state">You have no active reservations.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h2 class="section-title">Other Reservations</h2>
+  <div class="card table-card">
+    <table class="modern-table">
+      <thead>
+        <tr>
+          <th>Room & Desk Name</th>
+          <th>Reserved By (Email/Name)</th>
+          <th>Start Time</th>
+          <th>End Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (res of otherReservations; track res.id) {
+        <tr>
+          <td>{{ res.roomName }} - {{ res.deskName }}</td>
+          <td><span class="badge-email">{{ res.userName }}</span></td>
+          <td>{{ res.startTime | date:'short' }}</td>
+          <td>{{ res.endTime | date:'short' }}</td>
+        </tr>
+        } @empty {
+        <tr><td colspan="4" class="empty-state">No other reservations found.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+@if (isModalOpen) {
+<div class="modal-overlay animate-in" (click)="closeModal()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Book a Desk</h2>
+      <button class="close-btn" (click)="closeModal()"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <div class="modal-body">
+      @if (formErrorMessage) {
+      <div class="alert-error-banner animate-in">
+        <i class="bi bi-exclamation-octagon-fill"></i>
+        <span>{{ formErrorMessage }}</span>
+      </div>
+      }
+
+      <div class="form-group">
+        <label>Select Room</label>
+        <select class="modern-input" [(ngModel)]="selectedRoomId" (change)="onRoomChange()">
+          <option [ngValue]="null" disabled>Choose a room...</option>
+          @for (room of rooms; track room.id) {
+          <option [value]="room.id">{{ room.name }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Select Desk</label>
+        <select class="modern-input" [(ngModel)]="resForm.deskId" [disabled]="!selectedRoomId">
+          <option [ngValue]="0" disabled>Choose a desk...</option>
+          @for (desk of availableDesks; track desk.id) {
+          <option [value]="desk.id">{{ desk.deskIdentifier || ('Desk #' + desk.id) }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Start Time</label>
+          <input type="datetime-local" class="modern-input" [(ngModel)]="resForm.startTime">
+        </div>
+        <div class="form-group">
+          <label>End Time</label>
+          <input type="datetime-local" class="modern-input" [(ngModel)]="resForm.endTime">
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeModal()">Cancel</button>
+      <button class="btn-primary" (click)="confirmSaveReservation()">Confirm Booking</button>
+    </div>
+  </div>
+</div>
+}
+
+@if (notification.show) {
+<div class="toast-notification animate-in" [class.error]="notification.isError">
+  <i class="bi" [class.bi-check-circle-fill]="!notification.isError" [class.bi-x-circle-fill]="notification.isError"></i>
+  <span>{{ notification.message }}</span>
+</div>
+}
