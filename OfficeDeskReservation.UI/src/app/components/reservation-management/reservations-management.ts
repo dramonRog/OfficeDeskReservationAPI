@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ReservationService, ReservationDto } from '../../services/reservation.service';
 import { RoomService } from '../../services/room.service';
+import { UserService } from '../../services/user.service'; 
 
 @Component({
   selector: 'app-reservations-management',
@@ -11,12 +12,22 @@ import { RoomService } from '../../services/room.service';
 export class ReservationsComponent implements OnInit {
   public myReservations: any[] = [];
   public otherReservations: any[] = [];
+  public allUsers: any[] = []; 
 
   public currentUserId: number = 0;
+  public currentUserRole: string = '';
+
   public rooms: any[] = [];
   public availableDesks: any[] = [];
   public selectedRoomId: number | null = null;
+
   public isModalOpen: boolean = false;
+  public isConfirmDeleteModalOpen: boolean = false;
+  public reservationToDelete: number | null = null;
+
+  public isSaving: boolean = false;
+  public isDeleting: boolean = false;
+
   public formErrorMessage: string = '';
   public notification = { show: false, message: '', isError: false };
 
@@ -27,25 +38,51 @@ export class ReservationsComponent implements OnInit {
   constructor(
     private reservationService: ReservationService,
     private roomService: RoomService,
+    private userService: UserService, 
     private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
-    this.extractUserIdFromToken();
-    this.loadRooms(); 
+    this.extractUserDataFromToken();
+    this.loadRooms();
+    this.loadUsers(); 
     this.loadReservations();
   }
 
-  private extractUserIdFromToken(): void {
+  public get isAdminOrManager(): boolean {
+    return this.currentUserRole === 'Admin' || this.currentUserRole === 'Manager';
+  }
+
+  public getUserEmail(userId: number): string {
+    const user = this.allUsers.find(u => (u.id || u.Id) === userId);
+    if (user) {
+      return user.email || user.Email || 'No Email';
+    }
+    return 'Loading...';
+  }
+
+  private extractUserDataFromToken(): void {
     const token = localStorage.getItem('token');
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         this.currentUserId = Number(payload['nameid'] || payload['sub']);
+        this.currentUserRole = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
+          || payload['role']
+          || 'User';
       } catch (e) {
         console.error('Failed to parse token', e);
       }
     }
+  }
+
+  loadUsers(): void {
+    this.userService.getUsers(1, 1000).subscribe({
+      next: (res: any) => {
+        this.allUsers = res.items || res.Items || [];
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   loadReservations(): void {
@@ -94,32 +131,113 @@ export class ReservationsComponent implements OnInit {
     this.selectedRoomId = null;
     this.availableDesks = [];
     this.formErrorMessage = '';
+    this.isSaving = false;
     this.isModalOpen = true;
     this.cdr.detectChanges();
   }
 
   closeModal(): void {
     this.isModalOpen = false;
+    this.isSaving = false;
     this.cdr.detectChanges();
   }
 
   private extractErrorMessage(err: any): string {
-    if (!err || !err.error) return "An error occurred.";
-    return err.error.detail || err.error.Detail || "An unexpected error occurred.";
+    if (!err || !err.error) {
+      return "An unexpected error occurred.";
+    }
+
+    const error = err.error;
+
+    const validationErrors = error.errors || error.Errors;
+    if (validationErrors && Object.keys(validationErrors).length > 0) {
+      const firstKey = Object.keys(validationErrors)[0];
+      return validationErrors[firstKey][0];
+    }
+
+    const detail = error.detail || error.Detail;
+    if (detail) {
+      return detail;
+    }
+
+    const message = error.message || error.Message;
+    if (message) {
+      return message;
+    }
+
+    if (typeof error === 'string') {
+      return error;
+    }
+
+    return "An unexpected error occurred.";
   }
 
   confirmSaveReservation(): void {
+    this.formErrorMessage = '';
+
+    if (!this.resForm.deskId || !this.resForm.startTime || !this.resForm.endTime) {
+      this.formErrorMessage = "Please fill in all fields.";
+      return;
+    }
+
+    if (new Date(this.resForm.startTime) >= new Date(this.resForm.endTime)) {
+      this.formErrorMessage = "End time must be after the start time.";
+      return;
+    }
+
+    this.isSaving = true;
+    this.cdr.detectChanges();
+
     this.reservationService.createReservation(this.resForm).subscribe({
-      next: () => { this.loadReservations(); this.closeModal(); this.showNotification("Success!"); },
-      error: (err) => { this.formErrorMessage = this.extractErrorMessage(err); this.cdr.detectChanges(); }
+      next: () => {
+        this.isSaving = false;
+        this.loadReservations();
+        this.closeModal();
+        this.showNotification("Reservation created successfully!");
+      },
+      error: (err) => {
+        this.isSaving = false;
+        this.formErrorMessage = this.extractErrorMessage(err);
+        this.cdr.detectChanges();
+      }
     });
   }
 
-  deleteReservation(id: number): void {
-    if (confirm("Cancel this reservation?")) {
-      this.reservationService.deleteReservation(id).subscribe({
-        next: () => { this.loadReservations(); this.showNotification("Canceled."); },
-        error: (err) => this.showNotification(this.extractErrorMessage(err), true)
+  openDeleteModal(id: number): void {
+    this.reservationToDelete = id;
+    this.isDeleting = false;
+    this.isConfirmDeleteModalOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  closeDeleteModal(): void {
+    this.isConfirmDeleteModalOpen = false;
+    this.reservationToDelete = null;
+    this.isDeleting = false;
+    this.cdr.detectChanges();
+  }
+
+  confirmDeleteReservation(): void {
+    if (this.reservationToDelete) {
+      this.isDeleting = true;
+      this.cdr.detectChanges();
+
+      this.reservationService.deleteReservation(this.reservationToDelete).subscribe({
+        next: () => {
+          this.isDeleting = false;
+          this.loadReservations();
+          this.closeDeleteModal();
+          this.showNotification("Reservation canceled.");
+        },
+        error: (err) => {
+          this.isDeleting = false;
+          this.closeDeleteModal();
+          if (err.status === 403) {
+            this.showNotification("You don't have permission to delete this reservation.", true);
+          } else {
+            this.showNotification(this.extractErrorMessage(err), true);
+          }
+        }
       });
     }
   }

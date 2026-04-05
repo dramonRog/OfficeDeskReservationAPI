@@ -1,7 +1,7 @@
 <div class="page-container">
   <div class="page-header">
     <h1>Reservations</h1>
-    <button class="btn-primary" (click)="openAddModal()">
+    <button type="button" class="btn-primary" (click)="openAddModal()">
       <i class="bi bi-calendar-plus"></i> New Reservation
     </button>
   </div>
@@ -11,7 +11,8 @@
     <table class="modern-table">
       <thead>
         <tr>
-          <th>Room & Desk Name</th>
+          <th>Room Name</th>
+          <th>Desk Name</th>
           <th>Start Time</th>
           <th>End Time</th>
           <th>Actions</th>
@@ -20,17 +21,18 @@
       <tbody>
         @for (res of myReservations; track res.id) {
         <tr>
-          <td class="fw-bold">{{ res.roomName }} - {{ res.deskName }}</td>
+          <td>{{ res.roomName }}</td>
+          <td class="fw-bold">{{ res.deskName }}</td>
           <td>{{ res.startTime | date:'short' }}</td>
           <td>{{ res.endTime | date:'short' }}</td>
           <td class="actions-cell">
-            <button class="btn-icon delete" (click)="deleteReservation(res.id)" title="Cancel">
+            <button type="button" class="btn-icon delete" (click)="openDeleteModal(res.id)" title="Cancel Booking">
               <i class="bi bi-trash3"></i>
             </button>
           </td>
         </tr>
         } @empty {
-        <tr><td colspan="4" class="empty-state">You have no active reservations.</td></tr>
+        <tr><td colspan="5" class="empty-state">You have no active reservations.</td></tr>
         }
       </tbody>
     </table>
@@ -41,22 +43,36 @@
     <table class="modern-table">
       <thead>
         <tr>
-          <th>Room & Desk Name</th>
-          <th>Reserved By (Email/Name)</th>
+          <th>Room Name</th>
+          <th>Desk Name</th>
+          <th>Email</th>
           <th>Start Time</th>
           <th>End Time</th>
+          @if (isAdminOrManager) {
+          <th>Actions</th>
+          }
         </tr>
       </thead>
       <tbody>
         @for (res of otherReservations; track res.id) {
         <tr>
-          <td>{{ res.roomName }} - {{ res.deskName }}</td>
-          <td><span class="badge-email">{{ res.userName }}</span></td>
+          <td>{{ res.roomName }}</td>
+          <td class="fw-bold">{{ res.deskName }}</td>
+          <td><span class="badge-email">{{ getUserEmail(res.userId) }}</span></td>
           <td>{{ res.startTime | date:'short' }}</td>
           <td>{{ res.endTime | date:'short' }}</td>
+          @if (isAdminOrManager) {
+          <td class="actions-cell">
+            <button type="button" class="btn-icon delete" (click)="openDeleteModal(res.id)" title="Cancel this user's reservation">
+              <i class="bi bi-trash3"></i>
+            </button>
+          </td>
+          }
         </tr>
         } @empty {
-        <tr><td colspan="4" class="empty-state">No other reservations found.</td></tr>
+        <tr>
+          <td [colSpan]="isAdminOrManager ? 6 : 5" class="empty-state">No other reservations found.</td>
+        </tr>
         }
       </tbody>
     </table>
@@ -68,9 +84,8 @@
   <div class="modal-card" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>Book a Desk</h2>
-      <button class="close-btn" (click)="closeModal()"><i class="bi bi-x-lg"></i></button>
+      <button type="button" class="close-btn" (click)="closeModal()"><i class="bi bi-x-lg"></i></button>
     </div>
-
     <div class="modal-body">
       @if (formErrorMessage) {
       <div class="alert-error-banner animate-in">
@@ -78,42 +93,62 @@
         <span>{{ formErrorMessage }}</span>
       </div>
       }
-
       <div class="form-group">
         <label>Select Room</label>
-        <select class="modern-input" [(ngModel)]="selectedRoomId" (change)="onRoomChange()">
+        <select class="modern-input" [(ngModel)]="selectedRoomId" (change)="onRoomChange()" [disabled]="isSaving">
           <option [ngValue]="null" disabled>Choose a room...</option>
           @for (room of rooms; track room.id) {
-          <option [value]="room.id">{{ room.name }}</option>
+          <option [ngValue]="room.id">{{ room.name }}</option>
           }
         </select>
       </div>
-
       <div class="form-group">
         <label>Select Desk</label>
-        <select class="modern-input" [(ngModel)]="resForm.deskId" [disabled]="!selectedRoomId">
+        <select class="modern-input" [(ngModel)]="resForm.deskId" [disabled]="!selectedRoomId || isSaving">
           <option [ngValue]="0" disabled>Choose a desk...</option>
           @for (desk of availableDesks; track desk.id) {
-          <option [value]="desk.id">{{ desk.deskIdentifier || ('Desk #' + desk.id) }}</option>
+          <option [ngValue]="desk.id">{{ desk.deskIdentifier || ('Desk #' + desk.id) }}</option>
           }
         </select>
       </div>
-
       <div class="form-row">
         <div class="form-group">
           <label>Start Time</label>
-          <input type="datetime-local" class="modern-input" [(ngModel)]="resForm.startTime">
+          <input type="datetime-local" class="modern-input" [(ngModel)]="resForm.startTime" [disabled]="isSaving">
         </div>
         <div class="form-group">
           <label>End Time</label>
-          <input type="datetime-local" class="modern-input" [(ngModel)]="resForm.endTime">
+          <input type="datetime-local" class="modern-input" [(ngModel)]="resForm.endTime" [disabled]="isSaving">
         </div>
       </div>
     </div>
-
     <div class="modal-footer">
-      <button class="btn-secondary" (click)="closeModal()">Cancel</button>
-      <button class="btn-primary" (click)="confirmSaveReservation()">Confirm Booking</button>
+      <button type="button" class="btn-secondary" (click)="closeModal()" [disabled]="isSaving">Cancel</button>
+      <button type="button" class="btn-primary" (click)="confirmSaveReservation()" [disabled]="isSaving">
+        {{ isSaving ? 'Processing...' : 'Confirm Booking' }}
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+@if (isConfirmDeleteModalOpen) {
+<div class="modal-overlay animate-in" (click)="closeDeleteModal()">
+  <div class="modal-card" style="max-width: 400px;" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Cancel Reservation</h2>
+      <button type="button" class="close-btn" (click)="closeDeleteModal()"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="modal-body">
+      <p style="color: #4b5563; font-size: 1rem; margin: 0;">
+        Are you sure you want to cancel this reservation? This action cannot be undone.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="closeDeleteModal()" [disabled]="isDeleting">No, keep it</button>
+      <button type="button" class="btn-danger" (click)="confirmDeleteReservation()" [disabled]="isDeleting">
+        {{ isDeleting ? 'Deleting...' : 'Yes, cancel it' }}
+      </button>
     </div>
   </div>
 </div>
