@@ -294,3 +294,12 @@
     background-color: #dc2626;
     transform: translateY(-1px);
   }
+
+.btn-icon.edit {
+  color: #3b82f6;
+}
+
+  .btn-icon.edit:hover {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+  }

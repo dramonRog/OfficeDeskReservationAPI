@@ -26,6 +26,9 @@
           <td>{{ res.startTime | date:'short' }}</td>
           <td>{{ res.endTime | date:'short' }}</td>
           <td class="actions-cell">
+            <button type="button" class="btn-icon edit" (click)="openEditModal(res)" title="Edit Booking">
+              <i class="bi bi-pencil-square"></i>
+            </button>
             <button type="button" class="btn-icon delete" (click)="openDeleteModal(res.id)" title="Cancel Booking">
               <i class="bi bi-trash3"></i>
             </button>
@@ -63,6 +66,9 @@
           <td>{{ res.endTime | date:'short' }}</td>
           @if (isAdminOrManager) {
           <td class="actions-cell">
+            <button type="button" class="btn-icon edit" (click)="openEditModal(res)" title="Edit this user's booking">
+              <i class="bi bi-pencil-square"></i>
+            </button>
             <button type="button" class="btn-icon delete" (click)="openDeleteModal(res.id)" title="Cancel this user's reservation">
               <i class="bi bi-trash3"></i>
             </button>
@@ -83,7 +89,7 @@
 <div class="modal-overlay animate-in" (click)="closeModal()">
   <div class="modal-card" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Book a Desk</h2>
+      <h2>{{ isEditMode ? 'Edit Reservation' : 'Book a Desk' }}</h2>
       <button type="button" class="close-btn" (click)="closeModal()"><i class="bi bi-x-lg"></i></button>
     </div>
     <div class="modal-body">
@@ -125,7 +131,7 @@
     <div class="modal-footer">
       <button type="button" class="btn-secondary" (click)="closeModal()" [disabled]="isSaving">Cancel</button>
       <button type="button" class="btn-primary" (click)="confirmSaveReservation()" [disabled]="isSaving">
-        {{ isSaving ? 'Processing...' : 'Confirm Booking' }}
+        {{ isSaving ? 'Processing...' : (isEditMode ? 'Update Reservation' : 'Confirm Booking') }}
       </button>
     </div>
   </div>

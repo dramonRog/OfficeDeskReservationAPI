@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ReservationService, ReservationDto } from '../../services/reservation.service';
 import { RoomService } from '../../services/room.service';
-import { UserService } from '../../services/user.service'; 
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-reservations-management',
@@ -12,7 +12,7 @@ import { UserService } from '../../services/user.service';
 export class ReservationsComponent implements OnInit {
   public myReservations: any[] = [];
   public otherReservations: any[] = [];
-  public allUsers: any[] = []; 
+  public allUsers: any[] = [];
 
   public currentUserId: number = 0;
   public currentUserRole: string = '';
@@ -22,6 +22,9 @@ export class ReservationsComponent implements OnInit {
   public selectedRoomId: number | null = null;
 
   public isModalOpen: boolean = false;
+  public isEditMode: boolean = false; 
+  public currentReservationId: number | null = null; 
+
   public isConfirmDeleteModalOpen: boolean = false;
   public reservationToDelete: number | null = null;
 
@@ -38,14 +41,14 @@ export class ReservationsComponent implements OnInit {
   constructor(
     private reservationService: ReservationService,
     private roomService: RoomService,
-    private userService: UserService, 
+    private userService: UserService,
     private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
     this.extractUserDataFromToken();
     this.loadRooms();
-    this.loadUsers(); 
+    this.loadUsers();
     this.loadReservations();
   }
 
@@ -55,10 +58,7 @@ export class ReservationsComponent implements OnInit {
 
   public getUserEmail(userId: number): string {
     const user = this.allUsers.find(u => (u.id || u.Id) === userId);
-    if (user) {
-      return user.email || user.Email || 'No Email';
-    }
-    return 'Loading...';
+    return user ? (user.email || user.Email || 'No Email') : 'Loading...';
   }
 
   private extractUserDataFromToken(): void {
@@ -127,6 +127,8 @@ export class ReservationsComponent implements OnInit {
   }
 
   openAddModal(): void {
+    this.isEditMode = false;
+    this.currentReservationId = null;
     this.resForm = { deskId: 0, startTime: '', endTime: '' };
     this.selectedRoomId = null;
     this.availableDesks = [];
@@ -136,40 +138,50 @@ export class ReservationsComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
+  openEditModal(reservation: any): void {
+    this.isEditMode = true;
+    this.currentReservationId = reservation.id;
+    this.formErrorMessage = '';
+    this.isSaving = false;
+
+    const room = this.rooms.find(r => r.name === reservation.roomName);
+
+    if (room) {
+      this.selectedRoomId = room.id;
+      this.availableDesks = room.desks || room.Desks || [];
+
+      const desk = this.availableDesks.find(d => (d.deskIdentifier || d.DeskIdentifier) === reservation.deskName);
+
+      this.resForm = {
+        deskId: desk ? desk.id : 0,
+        startTime: this.formatDateForInput(reservation.startTime),
+        endTime: this.formatDateForInput(reservation.endTime)
+      };
+    }
+
+    this.isModalOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  private formatDateForInput(dateStr: string): string {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return date.toISOString().slice(0, 16);
+  }
+
   closeModal(): void {
     this.isModalOpen = false;
-    this.isSaving = false;
     this.cdr.detectChanges();
   }
 
   private extractErrorMessage(err: any): string {
-    if (!err || !err.error) {
-      return "An unexpected error occurred.";
-    }
-
+    if (!err || !err.error) return "An unexpected error occurred.";
     const error = err.error;
-
     const validationErrors = error.errors || error.Errors;
     if (validationErrors && Object.keys(validationErrors).length > 0) {
-      const firstKey = Object.keys(validationErrors)[0];
-      return validationErrors[firstKey][0];
+      return validationErrors[Object.keys(validationErrors)[0]][0];
     }
-
-    const detail = error.detail || error.Detail;
-    if (detail) {
-      return detail;
-    }
-
-    const message = error.message || error.Message;
-    if (message) {
-      return message;
-    }
-
-    if (typeof error === 'string') {
-      return error;
-    }
-
-    return "An unexpected error occurred.";
+    return error.detail || error.Detail || error.message || error.Message || "An unexpected error occurred.";
   }
 
   confirmSaveReservation(): void {
@@ -188,12 +200,16 @@ export class ReservationsComponent implements OnInit {
     this.isSaving = true;
     this.cdr.detectChanges();
 
-    this.reservationService.createReservation(this.resForm).subscribe({
+    const request = this.isEditMode && this.currentReservationId
+      ? this.reservationService.updateReservation(this.currentReservationId, this.resForm)
+      : this.reservationService.createReservation(this.resForm);
+
+    request.subscribe({
       next: () => {
         this.isSaving = false;
         this.loadReservations();
         this.closeModal();
-        this.showNotification("Reservation created successfully!");
+        this.showNotification(this.isEditMode ? "Reservation updated!" : "Reservation created!");
       },
       error: (err) => {
         this.isSaving = false;
@@ -212,8 +228,6 @@ export class ReservationsComponent implements OnInit {
 
   closeDeleteModal(): void {
     this.isConfirmDeleteModalOpen = false;
-    this.reservationToDelete = null;
-    this.isDeleting = false;
     this.cdr.detectChanges();
   }
 
@@ -232,11 +246,7 @@ export class ReservationsComponent implements OnInit {
         error: (err) => {
           this.isDeleting = false;
           this.closeDeleteModal();
-          if (err.status === 403) {
-            this.showNotification("You don't have permission to delete this reservation.", true);
-          } else {
-            this.showNotification(this.extractErrorMessage(err), true);
-          }
+          this.showNotification(err.status === 403 ? "Permission denied." : this.extractErrorMessage(err), true);
         }
       });
     }

@@ -28,6 +28,10 @@ export class ReservationService {
     return this.http.post<any>(this.apiUrl, reservation);
   }
 
+  updateReservation(id: number, reservation: ReservationDto): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, reservation);
+  }
+
   deleteReservation(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
