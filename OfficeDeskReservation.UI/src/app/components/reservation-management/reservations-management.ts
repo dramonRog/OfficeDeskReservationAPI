@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ReservationService, ReservationDto } from '../../services/reservation.service';
 import { RoomService } from '../../services/room.service';
 import { UserService } from '../../services/user.service';
-
+import { ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'app-reservations-management',
   templateUrl: './reservations-management.html',
@@ -47,7 +47,8 @@ export class ReservationsComponent implements OnInit {
     private reservationService: ReservationService,
     private roomService: RoomService,
     private userService: UserService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
@@ -55,6 +56,14 @@ export class ReservationsComponent implements OnInit {
     this.loadRooms();
     this.loadUsers();
     this.loadReservations();
+
+    this.route.queryParams.subscribe(params => {
+      if (params['action'] === 'new') {
+        setTimeout(() => {
+          this.openAddModal();
+        }, 100);
+      }
+    });
   }
 
   get totalMyPages(): number {

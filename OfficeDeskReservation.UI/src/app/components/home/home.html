@@ -1,0 +1,128 @@
+<div class="home-wrapper">
+  <div class="page-container">
+
+    <div class="hero-section animate-in">
+      <div class="hero-content">
+        <h1 class="hero-title">Welcome to DeskHub! 👋</h1>
+        <p class="hero-subtitle">
+          Your modern workspace management solution. Book desks, browse meeting rooms, and organize your office days seamlessly.
+        </p>
+        <div class="hero-actions">
+          <button class="btn-hero-primary" routerLink="/profile">
+            <i class="bi bi-person-circle"></i> My Profile
+          </button>
+          <button class="btn-hero-secondary" routerLink="/help">
+            <i class="bi bi-question-circle"></i> Help & Support
+          </button>
+        </div>
+      </div>
+      <div class="hero-image">
+        <i class="bi bi-buildings hero-icon"></i>
+      </div>
+    </div>
+
+    <div class="main-content-vertical animate-in" style="animation-delay: 0.1s;">
+
+      <div class="content-block">
+        <div class="section-header">
+          <span class="section-badge">Navigation</span>
+          <h2 class="section-title">Quick Actions</h2>
+        </div>
+        <div class="action-grid">
+          <div class="action-card" routerLink="/reservations" [queryParams]="{ action: 'new' }">
+            <div class="action-icon"><i class="bi bi-calendar-plus"></i></div>
+            <div class="action-text">
+              <h3>Book a Desk</h3>
+              <p>Schedule your next office visit.</p>
+            </div>
+          </div>
+
+          <div class="action-card" routerLink="/reservations">
+            <div class="action-icon"><i class="bi bi-journal-check"></i></div>
+            <div class="action-text">
+              <h3>My Bookings</h3>
+              <p>Manage your reservations.</p>
+            </div>
+          </div>
+
+          <div class="action-card" routerLink="/rooms">
+            <div class="action-icon"><i class="bi bi-door-open"></i></div>
+            <div class="action-text">
+              <h3>Browse Rooms</h3>
+              <p>Check available spaces.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="section-separator">
+
+      <div class="content-block">
+        <div class="section-header">
+          <span class="section-badge">Guide</span>
+          <h2 class="section-title">Getting Started</h2>
+        </div>
+        <div class="steps-container">
+
+          <div class="step-card">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <strong>Explore the office</strong>
+              <p>Go to the Rooms page to see available workspaces.</p>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <strong>Pick your spot</strong>
+              <p>Choose a desk that perfectly suits your needs.</p>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <strong>Select the time</strong>
+              <p>Set your arrival and departure times in the form.</p>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <strong>You are all set!</strong>
+              <p>Confirm your booking and get ready to work.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <hr class="section-separator">
+
+      <div class="content-block">
+        <div class="section-header">
+          <span class="section-badge">Features</span>
+          <h2 class="section-title">Why use DeskHub?</h2>
+        </div>
+        <div class="features-list">
+          <div class="feature-item">
+            <div class="feature-icon-small"><i class="bi bi-clock-history"></i></div>
+            <div class="feature-text">
+              <h3>Fast & Easy</h3>
+              <p>Find and secure an available desk in just a few clicks without any hassle.</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon-small"><i class="bi bi-shield-check"></i></div>
+            <div class="feature-text">
+              <h3>Secure Management</h3>
+              <p>Safely manage your schedule, update bookings, and view your workspace preferences.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
