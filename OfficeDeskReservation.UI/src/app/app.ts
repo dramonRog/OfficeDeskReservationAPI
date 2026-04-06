@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, HostListener } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router'; 
 import { filter } from 'rxjs/operators';
 
@@ -25,7 +25,7 @@ export class App implements OnInit {
     return this.navLinks.filter(link => link.roles.includes(this.userRole));
   }
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private eRef: ElementRef) {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
@@ -35,6 +35,17 @@ export class App implements OnInit {
 
   ngOnInit(): void {
     this.checkUserStatus();
+  }
+
+  @HostListener('document:click', ['$event'])
+  clickout(event: Event) {
+    if (this.isProfileOpen) {
+      const profileContainer = this.eRef.nativeElement.querySelector('.profile-container');
+
+      if (profileContainer && !profileContainer.contains(event.target as Node)) {
+        this.isProfileOpen = false;
+      }
+    }
   }
 
   public isLoggedIn(): boolean {
