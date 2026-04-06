@@ -35,8 +35,13 @@ export class ReservationsComponent implements OnInit {
   public notification = { show: false, message: '', isError: false };
 
   public resForm: ReservationDto = { deskId: 0, startTime: '', endTime: '' };
+  
   public pageNumber: number = 1;
-  public pageSize: number = 20;
+  public pageSize: number = 1000; 
+
+  public myPage: number = 1;
+  public otherPage: number = 1;
+  public tablePageSize: number = 5; 
 
   constructor(
     private reservationService: ReservationService,
@@ -51,6 +56,30 @@ export class ReservationsComponent implements OnInit {
     this.loadUsers();
     this.loadReservations();
   }
+
+  get totalMyPages(): number {
+    return Math.ceil(this.myReservations.length / this.tablePageSize) || 1;
+  }
+
+  get totalOtherPages(): number {
+    return Math.ceil(this.otherReservations.length / this.tablePageSize) || 1;
+  }
+
+  get displayedMyReservations(): any[] {
+    const start = (this.myPage - 1) * this.tablePageSize;
+    return this.myReservations.slice(start, start + this.tablePageSize);
+  }
+
+  get displayedOtherReservations(): any[] {
+    const start = (this.otherPage - 1) * this.tablePageSize;
+    return this.otherReservations.slice(start, start + this.tablePageSize);
+  }
+
+  nextMyPage(): void { if (this.myPage < this.totalMyPages) this.myPage++; }
+  prevMyPage(): void { if (this.myPage > 1) this.myPage--; }
+
+  nextOtherPage(): void { if (this.otherPage < this.totalOtherPages) this.otherPage++; }
+  prevOtherPage(): void { if (this.otherPage > 1) this.otherPage--; }
 
   public get isAdminOrManager(): boolean {
     return this.currentUserRole === 'Admin' || this.currentUserRole === 'Manager';
@@ -103,6 +132,9 @@ export class ReservationsComponent implements OnInit {
         this.myReservations = allItems.filter((r: any) => r.userId === this.currentUserId);
         this.otherReservations = allItems.filter((r: any) => r.userId !== this.currentUserId);
 
+        this.myPage = 1;
+        this.otherPage = 1;
+
         this.cdr.detectChanges();
       },
       error: () => this.showNotification('Failed to load reservations', true)
@@ -145,20 +177,17 @@ export class ReservationsComponent implements OnInit {
     this.isSaving = false;
 
     const room = this.rooms.find(r => r.name === reservation.roomName);
-
     if (room) {
       this.selectedRoomId = room.id;
       this.availableDesks = room.desks || room.Desks || [];
-
       const desk = this.availableDesks.find(d => (d.deskIdentifier || d.DeskIdentifier) === reservation.deskName);
-
+      
       this.resForm = {
         deskId: desk ? desk.id : 0,
         startTime: this.formatDateForInput(reservation.startTime),
         endTime: this.formatDateForInput(reservation.endTime)
       };
     }
-
     this.isModalOpen = true;
     this.cdr.detectChanges();
   }
