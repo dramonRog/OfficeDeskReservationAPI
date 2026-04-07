@@ -8,7 +8,8 @@ import { UserManagementComponent } from './components/user-management/user-manag
 import { DeskManagementComponent } from './components/desk-management/desk-management';
 import { roleGuard } from './guards/role.guard';
 import { RoomManagementComponent } from './components/room-management/room-management';
-import { ReservationsComponent } from './components/reservation-management/reservations-management'
+import { ReservationsComponent } from './components/reservation-management/reservations-management';
+import { HelpSupportComponent } from './components/help-support/help-support';
 
 const routes: Routes = [
   { path: '', component: HomeComponent, canActivate: [authGuard] },
@@ -34,6 +35,12 @@ const routes: Routes = [
     component: RoomManagementComponent,
     canActivate: [authGuard, roleGuard],
     data: { roles: ['Admin', 'Manager', 'User'] }
+  },
+
+  {
+    path: 'help',
+    component: HelpSupportComponent,
+    canActivate: [authGuard]
   }
 ];
 

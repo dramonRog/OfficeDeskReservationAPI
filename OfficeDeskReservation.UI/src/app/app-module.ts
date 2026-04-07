@@ -13,6 +13,8 @@ import { UserManagementComponent } from './components/user-management/user-manag
 import { DeskManagementComponent } from './components/desk-management/desk-management';
 import { RoomManagementComponent } from './components/room-management/room-management';
 import { ReservationsComponent } from './components/reservation-management/reservations-management';
+import { HelpSupportComponent } from './components/help-support/help-support';
+
 ;
 @NgModule({
   declarations: [
@@ -23,7 +25,8 @@ import { ReservationsComponent } from './components/reservation-management/reser
     UserManagementComponent,
     DeskManagementComponent,
     RoomManagementComponent,
-    ReservationsComponent
+    ReservationsComponent,
+    HelpSupportComponent
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,68 @@
+<div class="page-container animate-in">
+
+  <div class="page-header">
+    <div>
+      <h1>Help & Support</h1>
+      <p>Need assistance? Find answers to your questions or contact our support team.</p>
+    </div>
+  </div>
+
+  <div class="support-grid">
+
+    <div class="support-card">
+      <div class="card-icon"><i class="bi bi-headset"></i></div>
+      <h2>Contact Us</h2>
+      <p>If you have technical issues or need direct assistance, we are here to help.</p>
+
+      <div class="contact-details">
+        <div class="contact-item">
+          <i class="bi bi-envelope"></i>
+          <span>support&#64;deskhub.com</span>
+        </div>
+        <div class="contact-item">
+          <i class="bi bi-telephone"></i>
+          <span>+48 123 456 789</span>
+        </div>
+        <div class="contact-item">
+          <i class="bi bi-clock"></i>
+          <span>Mon - Fri, 8:00 AM - 4:00 PM</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="support-card">
+      <div class="card-icon"><i class="bi bi-tools"></i></div>
+      <h2>Facility Issues</h2>
+      <p>Found a broken chair, missing monitor, or AC problem? Let us know immediately.</p>
+      <button class="btn-primary" style="margin-top: 16px; width: 100%; justify-content: center;">
+        <i class="bi bi-flag"></i> Report an Issue
+      </button>
+    </div>
+
+  </div>
+
+  <div class="faq-section">
+    <div class="faq-header">
+      <span class="section-badge">Knowledge Base</span>
+      <h2>Frequently Asked Questions</h2>
+    </div>
+
+    <div class="faq-list">
+      @for (faq of faqs; track faq.question; let i = $index) {
+      <div class="faq-item" [class.active]="faq.isOpen" (click)="toggleFaq(i)">
+        <div class="faq-question">
+          <h3>{{ faq.question }}</h3>
+          <i class="bi" [class.bi-chevron-down]="!faq.isOpen" [class.bi-chevron-up]="faq.isOpen"></i>
+        </div>
+
+        @if (faq.isOpen) {
+        <div class="faq-answer animate-fade-in">
+          <p>{{ faq.answer }}</p>
+        </div>
+        }
+      </div>
+      }
+    </div>
+  </div>
+
+</div>
