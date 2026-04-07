@@ -29,6 +29,7 @@
           <h2 class="section-title">Quick Actions</h2>
         </div>
         <div class="action-grid">
+
           <div class="action-card" routerLink="/reservations" [queryParams]="{ action: 'new' }">
             <div class="action-icon"><i class="bi bi-calendar-plus"></i></div>
             <div class="action-text">
@@ -37,21 +38,22 @@
             </div>
           </div>
 
-          <div class="action-card" routerLink="/reservations">
-            <div class="action-icon"><i class="bi bi-journal-check"></i></div>
-            <div class="action-text">
-              <h3>My Bookings</h3>
-              <p>Manage your reservations.</p>
-            </div>
-          </div>
-
           <div class="action-card" routerLink="/rooms">
             <div class="action-icon"><i class="bi bi-door-open"></i></div>
             <div class="action-text">
               <h3>Browse Rooms</h3>
-              <p>Check available spaces.</p>
+              <p>Check available office rooms.</p>
             </div>
           </div>
+
+          <div class="action-card" routerLink="/desks">
+            <div class="action-icon"><i class="bi bi-laptop"></i></div>
+            <div class="action-text">
+              <h3>Browse Desks</h3>
+              <p>View all available desks.</p>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -123,6 +125,7 @@
           </div>
         </div>
       </div>
+
     </div>
   </div>
 </div>
