@@ -11,6 +11,8 @@ import { Observable } from 'rxjs';
 export class RoomManagementComponent implements OnInit {
   public rooms: RoomResponseDto[] = [];
 
+  public currentUserRole: string = '';
+
   public pageNumber: number = 1;
   public pageSize: number = 8;
   public totalCount: number = 0;
@@ -32,7 +34,12 @@ export class RoomManagementComponent implements OnInit {
   constructor(private roomService: RoomService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
+    this.extractUserDataFromToken();
     this.loadRooms();
+  }
+
+  public get isAdminOrManager(): boolean {
+    return this.currentUserRole === 'Admin' || this.currentUserRole === 'Manager';
   }
 
   public get hasNameError(): boolean {
@@ -157,6 +164,18 @@ export class RoomManagementComponent implements OnInit {
     }
 
     return "An unexpected error occurred.";
+  }
+
+  private extractUserDataFromToken(): void {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        this.currentUserRole = payload['role'];
+      } catch (e) {
+        console.error('Failed to parse token', e);
+      }
+    }
   }
 
   confirmSaveRoom(): void {

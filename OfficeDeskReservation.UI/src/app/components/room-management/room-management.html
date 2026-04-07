@@ -1,12 +1,14 @@
 <div class="admin-container animate-in">
   <div class="admin-header">
     <div>
-      <h1>Manage Rooms</h1>
-      <p>Add, update, or remove office rooms.</p>
+      <h1>Rooms</h1>
+      <p>{{ isAdminOrManager ? 'Add, update, or remove office rooms.' : 'Browse available office rooms.' }}</p>
     </div>
+    @if (isAdminOrManager) {
     <button class="btn-save" (click)="openAddModal()">
       <i class="bi bi-plus-lg"></i> Add Room
     </button>
+    }
   </div>
 
   <div class="table-card">
@@ -17,7 +19,9 @@
             <th>#</th>
             <th>Room Name</th>
             <th>Total Desks</th>
+            @if (isAdminOrManager) {
             <th class="text-right">Actions</th>
+            }
           </tr>
         </thead>
         <tbody>
@@ -42,6 +46,7 @@
               <span style="font-size: 12px; font-style: italic; color: #94a3b8;">No desks assigned</span>
               }
             </td>
+            @if (isAdminOrManager) {
             <td class="actions-cell">
               <button class="btn-icon edit" title="Edit" (click)="openEditModal(room)">
                 <i class="bi bi-pencil"></i>
@@ -50,11 +55,12 @@
                 <i class="bi bi-trash"></i>
               </button>
             </td>
+            }
           </tr>
           }
           @if (rooms.length === 0) {
           <tr>
-            <td colspan="4" class="empty-state">No rooms found. Try adding one!</td>
+            <td [colSpan]="isAdminOrManager ? 4 : 3" class="empty-state">No rooms found.</td>
           </tr>
           }
         </tbody>

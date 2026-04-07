@@ -33,7 +33,7 @@ const routes: Routes = [
     path: 'rooms',
     component: RoomManagementComponent,
     canActivate: [authGuard, roleGuard],
-    data: { roles: ['Admin', 'Manager'] }
+    data: { roles: ['Admin', 'Manager', 'User'] }
   }
 ];
 
