@@ -32,11 +32,18 @@ export class DeskManagementComponent implements OnInit {
     roomId: 0
   };
 
+  public currentUserRole: string = '';
+
   constructor(private deskService: DeskService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
+    this.extractUserDataFromToken();
     this.loadRooms();
     this.loadDesks();
+  }
+
+  public get isAdminOrManager(): boolean {
+    return this.currentUserRole === 'Admin' || this.currentUserRole === 'Manager';
   }
 
   showNotification(message: string, isError: boolean = false): void {
@@ -198,6 +205,19 @@ export class DeskManagementComponent implements OnInit {
           this.showNotification(err.error?.message || err.error || "Error deleting desk", true);
         }
       });
+    }
+  }
+
+  private extractUserDataFromToken(): void {
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        this.currentUserRole = payload['role'];
+      } catch (e) {
+        console.error('Failed to parse token', e);
+      }
     }
   }
 }

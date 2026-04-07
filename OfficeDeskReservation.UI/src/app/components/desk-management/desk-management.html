@@ -1,12 +1,14 @@
 <div class="admin-container animate-in">
   <div class="admin-header">
     <div>
-      <h1>Manage Desks</h1>
-      <p>Add, update, or remove workspace desks.</p>
+      <h1>Desks</h1>
+      <p>{{ isAdminOrManager ? 'Add, update, or remove office desks.' : 'Browse available office desks.' }}</p>
     </div>
+    @if (isAdminOrManager) {
     <button class="btn-save" (click)="openAddModal()">
       <i class="bi bi-plus-lg"></i> Add Desk
     </button>
+    }
   </div>
 
   <div class="table-card">
@@ -14,10 +16,12 @@
       <table class="modern-table">
         <thead>
           <tr>
-            <th>Number</th>
-            <th>Identifier</th>
-            <th>Room Name</th>
+            <th>#</th>
+            <th>Desk Identifier</th>
+            <th>Room</th>
+            @if (isAdminOrManager) {
             <th class="text-right">Actions</th>
+            }
           </tr>
         </thead>
         <tbody>
@@ -28,6 +32,7 @@
             </td>
             <td style="font-weight: 600; color: #0f172a;">{{ desk.deskIdentifier }}</td>
             <td style="font-weight: 600; color: #0f172a;">{{ desk.roomName || 'Unassigned' }}</td>
+            @if (isAdminOrManager) {
             <td class="actions-cell">
               <button class="btn-icon edit" title="Edit" (click)="openEditModal(desk)">
                 <i class="bi bi-pencil"></i>
@@ -36,11 +41,12 @@
                 <i class="bi bi-trash"></i>
               </button>
             </td>
+            }
           </tr>
           }
           @if (desks.length === 0) {
           <tr>
-            <td colspan="4" class="empty-state">No desks found. Try adding one!</td>
+            <td [colSpan]="isAdminOrManager ? 4 : 3" class="empty-state">No desks found.</td>
           </tr>
           }
         </tbody>

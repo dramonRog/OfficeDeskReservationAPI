@@ -26,7 +26,7 @@ const routes: Routes = [
     path: 'desks',
     component: DeskManagementComponent,
     canActivate: [authGuard, roleGuard],
-    data: { roles: ['Admin', 'Manager'] }
+    data: { roles: ['Admin', 'Manager', 'User'] }
   },
 
   {
