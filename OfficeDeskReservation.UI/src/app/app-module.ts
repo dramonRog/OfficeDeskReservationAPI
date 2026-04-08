@@ -14,6 +14,7 @@ import { DeskManagementComponent } from './components/desk-management/desk-manag
 import { RoomManagementComponent } from './components/room-management/room-management';
 import { ReservationsComponent } from './components/reservation-management/reservations-management';
 import { HelpSupportComponent } from './components/help-support/help-support';
+import { ProfileComponent } from './components/profile/profile';
 
 ;
 @NgModule({
@@ -26,7 +27,8 @@ import { HelpSupportComponent } from './components/help-support/help-support';
     DeskManagementComponent,
     RoomManagementComponent,
     ReservationsComponent,
-    HelpSupportComponent
+    HelpSupportComponent,
+    ProfileComponent
   ],
   imports: [
     BrowserModule,
