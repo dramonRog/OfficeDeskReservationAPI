@@ -1,14 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
   private apiUrl = 'https://localhost:7115/api/Users';
+  private currentUserSource = new BehaviorSubject<any>(this.getUserFromStorage());
+
+  public currentUser$ = this.currentUserSource.asObservable();
 
   constructor(private http: HttpClient) { }
+
 
   getUsers(pageNumber: number = 1, pageSize: number = 10, searchTerm: string = ''): Observable<any> {
     let url = `${this.apiUrl}?pageNumber=${pageNumber}&pageSize=${pageSize}`;
@@ -18,6 +22,16 @@ export class UserService {
     }
 
     return this.http.get(url);
+  }
+
+  private getUserFromStorage(): any {
+    const data = localStorage.getItem('currentUser');
+    return data ? JSON.parse(data) : null;
+  }
+
+  public updateCurrentUserState(user: any): void {
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    this.currentUserSource.next(user);
   }
 
   deleteUser(id: number): Observable<any> {
@@ -30,5 +44,21 @@ export class UserService {
 
   changeUserRole(id: number, role: number): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id}/role`, { role: role });
+  }
+
+  updateProfile(userData: { firstName: string, lastName: string, email: string }): Observable<any> {
+    return this.http.put(`${this.apiUrl}/profile`, userData);
+  }
+
+  changePassword(passwordData: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/change-password`, passwordData);
+  }
+
+  deleteAccount(): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/profile`);
+  }
+
+  getMyProfile(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/profile`);
   }
 }

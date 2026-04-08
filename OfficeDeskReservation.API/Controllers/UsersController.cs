@@ -38,6 +38,22 @@ namespace OfficeDeskReservation.API.Controllers
             return Ok(user);
         }
 
+        [Authorize]
+        [HttpGet("profile")]
+        public async Task<ActionResult<UserResponseDto>> GetMyProfileAsync()
+        {
+            string? currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!int.TryParse(currentUserId, out int currentId))
+                return Unauthorized();
+
+            UserResponseDto? user = await _service.GetUserByIdAsync(currentId);
+
+            if (user == null)
+                return NotFound();
+
+            return Ok(user);
+        }
 
         [Authorize]
         [HttpPut("{id}")]
@@ -66,9 +82,23 @@ namespace OfficeDeskReservation.API.Controllers
             return NotFound();
         }
 
+        [Authorize]
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangeMyPasswordAsync([FromBody] ChangePasswordDto request)
+        {
+            string? currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(currentUserId, out int currentId))
+                return Unauthorized();
+
+            if (await _service.ChangePasswordAsync(currentId, request))
+                return Ok(new { message = "Password changed successfully." });
+
+            return BadRequest(new { message = "Failed to change password." });
+        }
+
 
         [Authorize(Roles = "Admin")]
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> RemoveUserByIdAsync(int id)
         {
             string? currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

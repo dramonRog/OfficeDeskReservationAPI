@@ -1,6 +1,7 @@
 import { Component, OnInit, ElementRef, HostListener } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router'; 
 import { filter } from 'rxjs/operators';
+import { UserService } from './services/user.service';
 
 @Component({
   selector: 'app-root',
@@ -25,7 +26,7 @@ export class App implements OnInit {
     return this.navLinks.filter(link => link.roles.includes(this.userRole));
   }
 
-  constructor(private router: Router, private eRef: ElementRef) {
+  constructor(private router: Router, private eRef: ElementRef, private userService: UserService) {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
@@ -35,6 +36,21 @@ export class App implements OnInit {
 
   ngOnInit(): void {
     this.checkUserStatus();
+
+    this.userService.currentUser$.subscribe(user => {
+      if (user && (user.firstName || user.FirstName)) {
+        const fName = user.firstName || user.FirstName || '';
+        const lName = user.lastName || user.LastName || '';
+
+        this.userName = `${fName} ${lName}`.trim();
+
+        if (fName && lName) {
+          this.userInitials = (fName[0] + lName[0]).toUpperCase();
+        } else {
+          this.userInitials = this.userName.substring(0, 2).toUpperCase();
+        }
+      }
+    });
   }
 
   @HostListener('document:click', ['$event'])
@@ -93,6 +109,7 @@ export class App implements OnInit {
 
   public logout() {
     localStorage.removeItem('token');
+    localStorage.removeItem('currentUser');
     this.resetUserData();
     this.router.navigate(['/login']);
   }

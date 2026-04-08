@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-profile',
@@ -9,14 +10,14 @@ import { Router } from '@angular/router';
 })
 export class ProfileComponent implements OnInit {
 
-  // Model danych podstawowych
+  public currentUserId: number  = 0;
+
   public userForm = {
     firstName: '',
     lastName: '',
     email: ''
   };
 
-  // Model dla zmiany hasła
   public passwordForm = {
     currentPassword: '',
     newPassword: '',
@@ -29,12 +30,14 @@ export class ProfileComponent implements OnInit {
   public isDeleteModalOpen: boolean = false;
   public userInitials: string = 'U';
 
+  public profileError: string = '';
   public passwordError: string = '';
   public notification = { show: false, message: '', isError: false };
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private userService: UserService
   ) { }
 
   ngOnInit(): void {
@@ -42,45 +45,50 @@ export class ProfileComponent implements OnInit {
   }
 
   private loadUserData(): void {
-    const token = localStorage.getItem('token');
-    if (token) {
+    const cachedUserJson = localStorage.getItem('currentUser');
+    if (cachedUserJson) {
       try {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
-          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
+        const cachedUser = JSON.parse(cachedUserJson);
+        this.currentUserId = cachedUser.id || cachedUser.Id || 0;
+        this.userForm.firstName = cachedUser.firstName || cachedUser.FirstName || 'Unknown';
+        this.userForm.lastName = cachedUser.lastName || cachedUser.LastName || 'User';
+        this.userForm.email = cachedUser.email || cachedUser.Email || '';
 
-        const payload = JSON.parse(jsonPayload);
+        this.originalData = { ...this.userForm };
+        this.updateInitials();
+      } catch (e) {
+        console.error('Błąd odczytu z pamięci podręcznej', e);
+      }
+    }
 
-        this.userForm.email = payload.email || '';
-
-        let firstName = 'Unknown';
-        let lastName = 'User';
-
-        if (payload.unique_name) {
-          const parts = payload.unique_name.toString().trim().split(' ');
-          if (parts.length > 1) {
-            firstName = parts[0];
-            lastName = parts.slice(1).join(' ');
-          } else {
-            firstName = payload.unique_name;
-            lastName = '';
-          }
-        }
-
-        this.userForm.firstName = firstName || 'Unknown';
-        this.userForm.lastName = lastName || 'User';
+    this.userService.getMyProfile().subscribe({
+      next: (user) => {
+        this.currentUserId = user.id || user.Id;
+        this.userForm.firstName = user.firstName || user.FirstName || 'Unknown';
+        this.userForm.lastName = user.lastName || user.LastName || 'User';
+        this.userForm.email = user.email || user.Email || '';
 
         this.originalData = { ...this.userForm };
         this.updateInitials();
 
-      } catch (e) {
-        console.error('Błąd parsowania tokena:', e);
-        this.userForm.firstName = 'Unknown';
-        this.userForm.lastName = 'User';
+        localStorage.setItem('currentUser', JSON.stringify(user));
+      },
+      error: (err) => {
+        console.error('Nie udało się zsynchronizować profilu z bazą danych', err);
+        if (!this.currentUserId) {
+          this.setFallbackUser();
+        }
       }
-    }
+    });
+  }
+
+  private setFallbackUser(): void {
+    this.currentUserId = 0;
+    this.userForm.firstName = 'Unknown';
+    this.userForm.lastName = 'User';
+    this.userForm.email = '';
+    this.originalData = { ...this.userForm };
+    this.updateInitials();
   }
 
   private updateInitials(): void {
@@ -91,20 +99,56 @@ export class ProfileComponent implements OnInit {
 
   public toggleEditMode(): void {
     this.isEditMode = true;
+    this.profileError = '';
   }
 
   public cancelEdit(): void {
     this.userForm = { ...this.originalData };
     this.isEditMode = false;
+    this.profileError = '';
   }
 
   public saveProfile(): void {
-    // TODO: Tutaj API Call: this.userService.updateProfile(this.userForm)...
+    this.profileError = '';
 
-    this.originalData = { ...this.userForm };
-    this.updateInitials();
-    this.isEditMode = false;
-    this.showNotification('Profile updated successfully!');
+    if (!this.currentUserId) {
+      this.profileError = 'Błąd: Nie znaleziono ID użytkownika.';
+      return;
+    }
+
+    if (!this.userForm.firstName.trim() || !this.userForm.lastName.trim()) {
+      this.profileError = 'First name and Last name cannot be empty.';
+      return;
+    }
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(this.userForm.email)) {
+      this.profileError = 'Please enter a valid email address.';
+      return;
+    }
+
+    this.userService.updateUser(this.currentUserId, this.userForm).subscribe({
+      next: () => {
+        this.originalData = { ...this.userForm };
+        this.updateInitials();
+        this.isEditMode = false;
+        this.showNotification('Profile updated successfully!');
+
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const updatedUser = {
+          id: this.currentUserId,
+          firstName: this.userForm.firstName,
+          lastName: this.userForm.lastName,
+          email: this.userForm.email
+        };
+
+        this.userService.updateCurrentUserState(updatedUser);
+      },
+      error: (err) => {
+        console.error('Update failed', err);
+        this.profileError = err.error?.message || err.error || 'Failed to update profile. Please try again.';
+      }
+    });
   }
 
   public updatePassword(): void {
@@ -115,20 +159,44 @@ export class ProfileComponent implements OnInit {
       return;
     }
 
-    if (this.passwordForm.newPassword.length < 6) {
-      this.passwordError = 'New password must be at least 6 characters long.';
+    const pwd = this.passwordForm.newPassword;
+
+    if (pwd.length < 6) {
+      this.passwordError = 'Passwords must be at least 6 characters.';
+      return;
+    }
+    if (!/[a-z]/.test(pwd)) {
+      this.passwordError = 'Passwords must have at least one lowercase (\'a\'-\'z\').';
+      return;
+    }
+    if (!/[A-Z]/.test(pwd)) {
+      this.passwordError = 'Passwords must have at least one uppercase (\'A\'-\'Z\').';
+      return;
+    }
+    if (!/[0-9]/.test(pwd)) {
+      this.passwordError = 'Passwords must have at least one digit (\'0\'-\'9\').';
+      return;
+    }
+    if (!/[^a-zA-Z0-9]/.test(pwd)) {
+      this.passwordError = 'Passwords must have at least one non alphanumeric character.';
       return;
     }
 
     if (this.passwordForm.newPassword !== this.passwordForm.confirmPassword) {
-      this.passwordError = 'New passwords do not match.';
+      this.passwordError = 'The new password and confirmation password do not match.';
       return;
     }
 
-    // TODO: Tutaj API Call: this.userService.changePassword(this.passwordForm)...
-
-    this.passwordForm = { currentPassword: '', newPassword: '', confirmPassword: '' };
-    this.showNotification('Password changed successfully!');
+    this.userService.changePassword(this.passwordForm).subscribe({
+      next: () => {
+        this.passwordForm = { currentPassword: '', newPassword: '', confirmPassword: '' };
+        this.showNotification('Password changed successfully!');
+      },
+      error: (err) => {
+        console.error('Password change failed', err);
+        this.passwordError = err.error?.message || err.error || 'Failed to change password. Check your current password.';
+      }
+    });
   }
 
   public openDeleteModal(): void {
@@ -140,10 +208,7 @@ export class ProfileComponent implements OnInit {
   }
 
   public confirmDeleteAccount(): void {
-    // TODO: Tutaj API Call usuwający konto
-    this.closeDeleteModal();
-    localStorage.removeItem('token');
-    this.router.navigate(['/login']);
+    
   }
 
   public showNotification(message: string, isError: boolean = false): void {

@@ -109,5 +109,21 @@ namespace OfficeDeskReservation.API.Services.Implementations
 
             return true;
         }
+
+        public async Task<bool> ChangePasswordAsync(int userId, ChangePasswordDto request)
+        {
+            User? currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (currentUser == null)
+                return false;
+
+            if (!BCrypt.Net.BCrypt.Verify(request.CurrentPassword, currentUser.PasswordHash))
+                return false;
+
+            currentUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }
