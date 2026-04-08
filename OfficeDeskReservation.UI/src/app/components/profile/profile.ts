@@ -208,7 +208,19 @@ export class ProfileComponent implements OnInit {
   }
 
   public confirmDeleteAccount(): void {
-    
+    if (!this.currentUserId) return;
+
+    this.userService.deleteAccount().subscribe({
+      next: () => {
+        this.closeDeleteModal();
+        localStorage.removeItem('token');
+        localStorage.removeItem('currentUser');
+        this.router.navigate(['/login']);
+      },
+      error: (err) => {
+        this.closeDeleteModal();
+      }
+    });
   }
 
   public showNotification(message: string, isError: boolean = false): void {

@@ -120,5 +120,20 @@ namespace OfficeDeskReservation.API.Controllers
                 return NoContent();
             return NotFound();
         }
+
+        [Authorize]
+        [HttpDelete("profile")]
+        public async Task<IActionResult> DeleteMyProfileAsync()
+        {
+            string? currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!int.TryParse(currentUserId, out int currentId))
+                return Unauthorized();
+
+            if (await _service.DeleteUserAsync(currentId))
+                return Ok(new { message = "Account was successfully deleted." });
+
+            return BadRequest(new { message = "Failed to delete account." });
+        }
     }
 }
