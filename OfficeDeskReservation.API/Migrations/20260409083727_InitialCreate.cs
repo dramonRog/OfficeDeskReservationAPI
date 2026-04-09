@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace OfficeDeskReservation.API.Migrations
 {
     /// <inheritdoc />
@@ -89,30 +87,6 @@ namespace OfficeDeskReservation.API.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.InsertData(
-                table: "Rooms",
-                columns: new[] { "Id", "Name" },
-                values: new object[,]
-                {
-                    { 1, "Open Space A" },
-                    { 2, "Meeting Room 1" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Users",
-                columns: new[] { "Id", "Email", "FirstName", "LastName", "PasswordHash", "Role" },
-                values: new object[] { 1, "roman.buchynskyi2006@gmail.com", "Roman", "Buchynskyi", "$2a$11$KYxIeRootPrk.RLtbBRBle5TRHsZG9l4zJ5Q2krvF16REoqjvGQHS", 2 });
-
-            migrationBuilder.InsertData(
-                table: "Desks",
-                columns: new[] { "Id", "DeskIdentifier", "RoomId" },
-                values: new object[,]
-                {
-                    { 1, "A-101", 1 },
-                    { 2, "A-102", 1 },
-                    { 3, "M-01", 2 }
                 });
 
             migrationBuilder.CreateIndex(

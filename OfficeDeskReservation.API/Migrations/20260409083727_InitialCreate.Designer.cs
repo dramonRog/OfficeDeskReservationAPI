@@ -12,7 +12,7 @@ using OfficeDeskReservation.API.Data;
 namespace OfficeDeskReservation.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260403134606_InitialCreate")]
+    [Migration("20260409083727_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -45,26 +45,6 @@ namespace OfficeDeskReservation.API.Migrations
                     b.HasIndex("RoomId");
 
                     b.ToTable("Desks");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            DeskIdentifier = "A-101",
-                            RoomId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            DeskIdentifier = "A-102",
-                            RoomId = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            DeskIdentifier = "M-01",
-                            RoomId = 2
-                        });
                 });
 
             modelBuilder.Entity("OfficeDeskReservation.API.Models.Reservation", b =>
@@ -111,18 +91,6 @@ namespace OfficeDeskReservation.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Rooms");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Open Space A"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Meeting Room 1"
-                        });
                 });
 
             modelBuilder.Entity("OfficeDeskReservation.API.Models.User", b =>
@@ -158,17 +126,6 @@ namespace OfficeDeskReservation.API.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Email = "roman.buchynskyi2006@gmail.com",
-                            FirstName = "Roman",
-                            LastName = "Buchynskyi",
-                            PasswordHash = "$2a$11$KYxIeRootPrk.RLtbBRBle5TRHsZG9l4zJ5Q2krvF16REoqjvGQHS",
-                            Role = 2
-                        });
                 });
 
             modelBuilder.Entity("OfficeDeskReservation.API.Models.Desk", b =>

@@ -11,6 +11,7 @@ using Microsoft.OpenApi.Models;
 using FluentValidation.AspNetCore;
 using FluentValidation;
 using Serilog;
+using OfficeDeskReservation.API.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -138,11 +139,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
-app.UseMiddleware<GlobalExceptionMiddleware>();
+//app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
+
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -157,4 +158,18 @@ static void ApplyMigration(WebApplication app)
 
     if (dbContext.Database.GetPendingMigrations().Any())
         dbContext.Database.Migrate();
+
+    if (!dbContext.Users.Any())
+    {
+        dbContext.Users.Add(new User
+        {
+            FirstName = "Roman",
+            LastName = "Buchynskyi",
+            Email = "roman.buchynskyi2006@gmail.com",
+            PasswordHash = "$2a$11$KYxIeRootPrk.RLtbBRBle5TRHsZG9l4zJ5Q2krvF16REoqjvGQHS",
+            Role = Role.Admin
+        });
+
+        dbContext.SaveChanges();
+    }
 }
