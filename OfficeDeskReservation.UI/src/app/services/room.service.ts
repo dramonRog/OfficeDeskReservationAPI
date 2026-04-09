@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface RoomDto {
   name: string;
@@ -16,7 +17,7 @@ export interface RoomResponseDto {
   providedIn: 'root'
 })
 export class RoomService {
-  private apiUrl = 'https://localhost:7115/api/Rooms';
+  private apiUrl = environment.apiUrl + '/Rooms';
 
   constructor(private http: HttpClient) { }
 

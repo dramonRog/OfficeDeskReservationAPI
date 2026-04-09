@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
+
 
 @Component({
   selector: 'app-login',
@@ -25,7 +27,7 @@ export class LoginComponent {
   public hasError: boolean = false; 
 
   public onLogin(): void {
-    const url: string = 'https://localhost:7115/api/Auth/login';
+    const url: string = environment.apiUrl  + '/Auth/login';
 
     this.errorMessage = '';
     this.successMessage = '';
