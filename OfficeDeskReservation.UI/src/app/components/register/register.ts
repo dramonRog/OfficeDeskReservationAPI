@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-register',
@@ -39,8 +40,8 @@ export class RegisterComponent {
       return;
     }
 
-    const regUrl = 'https://localhost:7115/api/Auth/register';
-    const loginUrl = 'https://localhost:7115/api/Auth/login';
+    const regUrl = environment.apiUrl + '/Auth/register';
+    const loginUrl = environment.apiUrl + '/Auth/login';
     const { confirmPassword, ...dataToRegister } = this.regObj;
 
     this.http.post(regUrl, dataToRegister).subscribe({

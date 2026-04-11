@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface ReservationDto {
   deskId: number;
@@ -12,7 +13,7 @@ export interface ReservationDto {
   providedIn: 'root'
 })
 export class ReservationService {
-  private apiUrl = 'https://localhost:7115/api/Reservations';
+  private apiUrl = environment.apiUrl + '/Reservations';
 
   constructor(private http: HttpClient) { }
 

@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'https://localhost:7115/api/Users';
+  private apiUrl = environment.apiUrl + '/Users';
   private currentUserSource = new BehaviorSubject<any>(this.getUserFromStorage());
 
   public currentUser$ = this.currentUserSource.asObservable();

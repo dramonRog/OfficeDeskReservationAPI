@@ -11,6 +11,7 @@ using Microsoft.OpenApi.Models;
 using FluentValidation.AspNetCore;
 using FluentValidation;
 using Serilog;
+using OfficeDeskReservation.API.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -122,13 +123,21 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policyBuilder =>
     {
-        policyBuilder.AllowAnyOrigin()
-                     .AllowAnyMethod()
-                     .AllowAnyHeader();
+        policyBuilder.WithOrigins(
+            "http://localhost:8080",
+            "http://localhost:4200",
+            "http://localhost:59997",
+            "http://127.0.0.1:8080"
+        )
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials();
     });
 });
 
 var app = builder.Build();
+
+app.UseCors("AllowAll");
 
 ApplyMigration(app);
 
@@ -136,13 +145,10 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseHttpsRedirection();
 }
 
-app.UseHttpsRedirection();
-
 app.UseMiddleware<GlobalExceptionMiddleware>();
-
-app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -157,4 +163,18 @@ static void ApplyMigration(WebApplication app)
 
     if (dbContext.Database.GetPendingMigrations().Any())
         dbContext.Database.Migrate();
+
+    if (!dbContext.Users.Any())
+    {
+        dbContext.Users.Add(new User
+        {
+            FirstName = "Roman",
+            LastName = "Buchynskyi",
+            Email = "roman.buchynskyi2006@gmail.com",
+            PasswordHash = "$2a$11$KYxIeRootPrk.RLtbBRBle5TRHsZG9l4zJ5Q2krvF16REoqjvGQHS",
+            Role = Role.Admin
+        });
+
+        dbContext.SaveChanges();
+    }
 }
